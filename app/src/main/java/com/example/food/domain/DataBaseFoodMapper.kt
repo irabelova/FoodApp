@@ -1,0 +1,41 @@
+package com.example.food.domain
+
+import com.example.food.data.database.entities.CategoryEntity
+import com.example.food.data.database.entities.FoodEntity
+import com.example.food.domain.models.Category
+import com.example.food.domain.models.Food
+
+class DataBaseFoodMapper {
+
+    fun foodToFoodEntity(model: Food, categoryId: Long) =
+        FoodEntity(
+            id = model.id,
+            name = model.name,
+            thumbnailUrl = model.thumbnailUrl,
+            description = model.description,
+            timeMinutes = model.timeMinutes,
+            categoryId = categoryId
+        )
+
+    fun categoryToCategoryEntity(model: Category) =
+        CategoryEntity(
+            id = model.id,
+            name = model.name,
+            displayName = model.displayName
+        )
+
+    fun foodEntityToFood(entity: FoodEntity) =
+        Food(
+            id = entity.id,
+            name = entity.name,
+            thumbnailUrl = entity.thumbnailUrl,
+            description = entity.description,
+            timeMinutes = entity.timeMinutes,
+        )
+    fun categoryEntityToCategory(entity: CategoryEntity) =
+        Category(
+            id = entity.id,
+            name = entity.name,
+            displayName = entity.displayName
+        )
+}

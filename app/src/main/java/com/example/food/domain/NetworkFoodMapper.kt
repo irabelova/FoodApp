@@ -1,0 +1,25 @@
+package com.example.food.domain
+
+import com.example.food.data.network.dto.CategoryDto
+import com.example.food.data.network.dto.FoodDto
+import com.example.food.domain.models.Category
+import com.example.food.domain.models.Food
+
+class NetworkFoodMapper {
+
+    fun categoryDtoToCategory(dto: CategoryDto) =
+        Category(
+            id = dto.id,
+            name = dto.name,
+            displayName = dto.displayName
+        )
+
+    fun foodDtoToFood(dto: FoodDto) =
+        Food(
+            id = dto.id,
+            name = dto.name,
+            thumbnailUrl = dto.thumbnailUrl,
+            description = dto.description,
+            timeMinutes = dto.timeMinutes ?: 0
+        )
+}
