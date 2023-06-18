@@ -47,7 +47,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
         android:ellipsize="end"
-        android:maxLines="4"
+        android:maxLines="3"
         android:textColor="@color/descriptionText"
         android:textSize="14sp"
         app:layout_constraintBottom_toTopOf="@id/food_time"
