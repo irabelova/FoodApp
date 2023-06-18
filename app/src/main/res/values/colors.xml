@@ -13,4 +13,6 @@
     <color name="buttonBackground">#FFD8E1</color>
     <color name="inactiveTextButton">#C3C4C9</color>
     <color name="background">#FBFBFB</color>
+    <color name="inactiveItemInBottomMenu">#7B7B7B</color>
+    <color name="bottomBackground">#F0F0F0</color>
 </resources>

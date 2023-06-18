@@ -55,7 +55,7 @@ class FakeDataSource : DataSource {
         name = "Soup",
         thumbnailUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4ehfDVe_Y5YuvJ7oc14SWbndJyWn5Ya49cQ&usqp=CAU",
         description = "SoupSoup",
-        timeMinutes = 45
+        timeMinutes = 0
     )
 
     private val food2 = Food(
@@ -84,12 +84,12 @@ class FakeDataSource : DataSource {
     )
 
     override suspend fun getCategories(): List<Category> {
-        delay(1000)
+        delay(2000)
         return categoryList
     }
 
     override suspend fun getFoodsByCategory(category: Category): List<Food> {
-        delay(1000)
+        delay(2000)
         return foodList
     }
 }

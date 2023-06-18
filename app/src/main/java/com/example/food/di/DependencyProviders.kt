@@ -29,8 +29,8 @@ class DependencyProviders(private val context: Context) {
 
     val foodApiService: FoodApiService = retrofit.create()
 
-//    fun getDataSource(): DataSource = RapidApiDataSource(foodApiService, NetworkFoodMapper())
-    private fun getDataSource(): FakeDataSource = FakeDataSource()
+    fun getDataSource(): DataSource = RapidApiDataSource(foodApiService, NetworkFoodMapper())
+//    private fun getDataSource(): FakeDataSource = FakeDataSource()
 
     val database = Room.databaseBuilder(
         context.applicationContext,
