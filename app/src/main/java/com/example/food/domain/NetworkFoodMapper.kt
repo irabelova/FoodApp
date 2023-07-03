@@ -4,8 +4,9 @@ import com.example.food.data.network.dto.CategoryDto
 import com.example.food.data.network.dto.FoodDto
 import com.example.food.domain.models.Category
 import com.example.food.domain.models.Food
+import javax.inject.Inject
 
-class NetworkFoodMapper {
+class NetworkFoodMapper @Inject constructor(){
 
     fun categoryDtoToCategory(dto: CategoryDto) =
         Category(

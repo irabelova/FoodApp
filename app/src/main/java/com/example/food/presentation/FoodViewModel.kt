@@ -5,8 +5,9 @@ import androidx.lifecycle.*
 import com.example.food.domain.Repository
 import com.example.food.domain.models.Category
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class FoodViewModel(
+class FoodViewModel @Inject constructor(
     private val repository: Repository
 ) : ViewModel() {
 
@@ -58,14 +59,6 @@ class FoodViewModel(
         } catch (ex: Exception) {
             Log.e("FoodViewModel", "loading foods error", ex)
             FoodState.Error
-        }
-    }
-
-    class FoodViewModelFactory(
-        private val repository: Repository,
-    ) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return FoodViewModel(repository) as T
         }
     }
 

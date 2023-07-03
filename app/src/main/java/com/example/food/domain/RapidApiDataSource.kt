@@ -3,8 +3,9 @@ package com.example.food.domain
 import com.example.food.data.network.FoodApiService
 import com.example.food.domain.models.Category
 import com.example.food.domain.models.Food
+import javax.inject.Inject
 
-class RapidApiDataSource(
+class RapidApiDataSource @Inject constructor(
     private val service: FoodApiService,
     private val mapper: NetworkFoodMapper
 ): DataSource {

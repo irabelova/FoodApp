@@ -3,8 +3,9 @@ package com.example.food.domain
 import com.example.food.data.database.FoodDao
 import com.example.food.domain.models.Category
 import com.example.food.domain.models.Food
+import javax.inject.Inject
 
-class DataBaseDataSource(
+class DataBaseDataSource @Inject constructor(
     private val foodDao: FoodDao,
     private val mapper: DataBaseFoodMapper
 ): LocalDataSource {

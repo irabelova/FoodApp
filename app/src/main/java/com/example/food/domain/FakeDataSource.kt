@@ -3,8 +3,9 @@ package com.example.food.domain
 import com.example.food.domain.models.Category
 import com.example.food.domain.models.Food
 import kotlinx.coroutines.delay
+import javax.inject.Inject
 
-class FakeDataSource : DataSource {
+class FakeDataSource @Inject constructor(): DataSource {
     private val category1 = Category(
         id = 1,
         name = "italian",

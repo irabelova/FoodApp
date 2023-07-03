@@ -7,24 +7,31 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.example.food.FoodApplication
+import com.example.food.MainActivity
 import com.example.food.R
 import com.example.food.databinding.FoodFragmentBinding
-import com.example.food.di.DependencyProviders
+import com.example.food.di.ViewModelProviderFactory
 import com.example.food.domain.models.Category
 import com.example.food.domain.models.Food
+import javax.inject.Inject
+
 
 class FoodFragment : Fragment() {
     private lateinit var binding: FoodFragmentBinding
-    private lateinit var provider: DependencyProviders
+
+    @Inject
+    protected lateinit var providerFactory: ViewModelProviderFactory
+
+//    @Inject
+//    protected lateinit var repository: Repository
     private val viewModel: FoodViewModel by viewModels {
-        FoodViewModel.FoodViewModelFactory(provider.getRepository())
+        providerFactory
     }
     private lateinit var foodAdapter: FoodAdapter
     private lateinit var categoriesAdapter: CategoriesAdapter
 
     override fun onAttach(context: Context) {
-        provider = (requireActivity().application as FoodApplication).provider
+        (activity as MainActivity).component.inject(this)
         super.onAttach(context)
     }
 
@@ -57,6 +64,7 @@ class FoodFragment : Fragment() {
             }
 
         }
+
         viewModel.foodState.observe(viewLifecycleOwner) {
             when (it) {
                 FoodState.Loading -> showLoadingFoods()

@@ -3,8 +3,9 @@ package com.example.food.domain
 import android.util.Log
 import com.example.food.domain.models.Category
 import com.example.food.domain.models.Food
+import javax.inject.Inject
 
-class Repository(
+class Repository @Inject constructor(
     private val dataSource: DataSource,
     private val localDataSource: LocalDataSource
 ) {

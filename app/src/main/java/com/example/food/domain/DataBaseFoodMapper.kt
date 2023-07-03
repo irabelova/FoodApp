@@ -4,8 +4,9 @@ import com.example.food.data.database.entities.CategoryEntity
 import com.example.food.data.database.entities.FoodEntity
 import com.example.food.domain.models.Category
 import com.example.food.domain.models.Food
+import javax.inject.Inject
 
-class DataBaseFoodMapper {
+class DataBaseFoodMapper @Inject constructor(){
 
     fun foodToFoodEntity(model: Food, categoryId: Long) =
         FoodEntity(
