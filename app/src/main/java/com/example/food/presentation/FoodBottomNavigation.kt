@@ -1,56 +1,36 @@
-package com.example.food.presentation.mainScreen
+package com.example.food.presentation
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.food.FoodBottomMenuItem
 import com.example.food.R
 
 
-sealed class FoodBottomMenuItem(
-    val imageVector: ImageVector,
-    @StringRes val text: Int,
-) {
-    object Menu : FoodBottomMenuItem(
-        imageVector = Icons.Filled.Fastfood,
-        text = R.string.menu,
-    )
-
-    object Profile : FoodBottomMenuItem(
-        imageVector = Icons.Filled.Person,
-        text = R.string.profile,
-    )
-
-    object Basket : FoodBottomMenuItem(
-        imageVector = Icons.Filled.ShoppingBasket,
-        text = R.string.basket,
-    )
-}
-
 @Composable
-fun FoodBottomNavigationMenu(selectedIndex: Int, onSelectedIndex: (Int) -> Unit, modifier: Modifier = Modifier) {
+fun FoodBottomNavigationMenu(navController: NavController, modifier: Modifier = Modifier) {
 
     val items = listOf(
         FoodBottomMenuItem.Menu,
         FoodBottomMenuItem.Profile,
         FoodBottomMenuItem.Basket,
     )
+    val currentBackStack by navController.currentBackStackEntryAsState()
+    val currentDestination = currentBackStack?.destination
+
     Box(
         modifier = modifier.fillMaxWidth(),
     ) {
@@ -60,8 +40,10 @@ fun FoodBottomNavigationMenu(selectedIndex: Int, onSelectedIndex: (Int) -> Unit,
         ) {
 
             items.forEachIndexed { index, item ->
+                val isSelected = currentDestination?.hierarchy?.any {
+                    it.route == item.route} == true
                 val color =
-                    if (index == selectedIndex)
+                    if (isSelected)
                         colorResource(id = R.color.outlineColor)
                     else
                         colorResource(id = R.color.inactiveItemInBottomMenu)
@@ -82,9 +64,16 @@ fun FoodBottomNavigationMenu(selectedIndex: Int, onSelectedIndex: (Int) -> Unit,
                             color = color
                         )
                     },
-                    selected = index == selectedIndex,
+                    selected = isSelected,
                     onClick = {
-                        onSelectedIndex(index)
+                        navController.navigate(item.route) {
+
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = false
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
                     }
                 )
             }
@@ -92,19 +81,3 @@ fun FoodBottomNavigationMenu(selectedIndex: Int, onSelectedIndex: (Int) -> Unit,
     }
 }
 
-@Composable
-fun StatefulMenuItem(modifier: Modifier = Modifier) {
-    var selectedIndex: Int by rememberSaveable { mutableStateOf(0) }
-
-    FoodBottomNavigationMenu(
-        selectedIndex = selectedIndex,
-        onSelectedIndex = {selectedIndex = it},
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun FoodBottomNavigationMenuPreview() {
-    StatefulMenuItem()
-}

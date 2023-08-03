@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
@@ -20,16 +19,14 @@ import com.example.food.domain.models.Food
 import com.example.food.presentation.ErrorScreen
 import com.example.food.presentation.LoadingScreen
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FoodScreen(
-    modifier: Modifier,
+fun Food(
     categories: List<Category>,
     selectedCategory: Category?,
     foodState: FoodState?,
-    selectedIndex: Int,
     onCategorySelected: (Category) -> Unit,
-    onSelectedIndex: (Int) -> Unit,
     onReloadFood: () -> Unit
 ) {
     val listState = rememberLazyListState()
@@ -37,21 +34,9 @@ fun FoodScreen(
         derivedStateOf {
             listState.firstVisibleItemIndex }
     }
-
-    Scaffold(
-        modifier = modifier,
-        topBar = { FoodTopBar() },
-        bottomBar = {
-            FoodBottomNavigationMenu(
-                selectedIndex = selectedIndex,
-                onSelectedIndex = onSelectedIndex
-            )
-        }
-    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(it)
         ) {
             if(firstItemIndex.value > 0) {
                 Categories(
@@ -97,11 +82,11 @@ fun FoodScreen(
             }
         }
     }
-}
+
 
 @Preview(showBackground = true)
 @Composable
-fun FoodScreenPreview() {
+fun FoodPreview() {
     val food1 = Food(
         id = 11,
         name = "Soup",
@@ -134,13 +119,10 @@ fun FoodScreenPreview() {
         food2,
         food3
     )
-    FoodScreen(
-        modifier = Modifier.fillMaxSize(),
+    Food(
         categories = categoryList,
         selectedCategory = categoryList[0],
         foodState = FoodState.FoodData(foodList),
-        selectedIndex = 0,
-        onSelectedIndex = {},
         onCategorySelected = {},
         onReloadFood = {}
     )

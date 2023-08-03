@@ -26,7 +26,7 @@ import com.example.food.R
 
 @Composable
 fun FoodTopBar(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var selectedCity: String by rememberSaveable { mutableStateOf("Москва") }
     var expanded: Boolean by rememberSaveable { mutableStateOf(false) }

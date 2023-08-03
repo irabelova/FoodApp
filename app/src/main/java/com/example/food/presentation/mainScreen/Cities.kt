@@ -52,7 +52,7 @@ fun City(
 
 @Composable
 fun CitiesList(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     onCitySelected: (String) -> Unit,
     selectedCity: String = "Москва"
 ) {
