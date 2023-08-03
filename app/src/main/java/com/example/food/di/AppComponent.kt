@@ -1,7 +1,7 @@
 package com.example.food.di
 
 import android.content.Context
-import com.example.food.presentation.FoodFragment
+import com.example.food.MainActivity
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -12,7 +12,7 @@ import javax.inject.Singleton
 )
 interface AppComponent {
 
-    fun inject(foodFragment: FoodFragment)
+    fun inject(mainActivity: MainActivity)
 
     @Component.Factory
     interface AppComponentFactory {

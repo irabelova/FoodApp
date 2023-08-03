@@ -1,4 +1,4 @@
-package com.example.food.presentation
+package com.example.food.presentation.mainScreen
 
 import android.util.Log
 import androidx.lifecycle.*
@@ -24,7 +24,7 @@ class FoodViewModel @Inject constructor(
         initialLoading()
     }
 
-    private fun initialLoading() {
+    fun initialLoading() {
         viewModelScope.launch {
             _categoryState.value = CategoryState.InitialLoading
             try {
@@ -34,7 +34,6 @@ class FoodViewModel @Inject constructor(
                     categories = categories,
                 )
                 _selectedCategory.value = selectedCategory
-                _foodState.value = FoodState.Loading
                 _foodState.value = loadFoods(selectedCategory)
 
             } catch (ex: Exception) {
@@ -48,12 +47,18 @@ class FoodViewModel @Inject constructor(
     fun changeCategory(category: Category) {
         _selectedCategory.value = category
         viewModelScope.launch {
-            _foodState.value = FoodState.Loading
             _foodState.value = loadFoods(category)
         }
     }
 
+    fun reloadFoods () {
+        viewModelScope.launch {
+            _foodState.value = loadFoods(selectedCategory.value!!)
+        }
+    }
+
     private suspend fun loadFoods(category: Category): FoodState {
+        _foodState.value = FoodState.Loading
         return try {
             FoodState.FoodData(repository.getFoods(category))
         } catch (ex: Exception) {

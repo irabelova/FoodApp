@@ -1,7 +1,7 @@
 package com.example.food.di
 
 import androidx.lifecycle.ViewModel
-import com.example.food.presentation.FoodViewModel
+import com.example.food.presentation.mainScreen.FoodViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap

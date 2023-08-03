@@ -2,9 +2,9 @@ package com.example.food
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.food.domain.Repository
-import com.example.food.presentation.CategoryState
-import com.example.food.presentation.FoodState
-import com.example.food.presentation.FoodViewModel
+import com.example.food.presentation.mainScreen.CategoryState
+import com.example.food.presentation.mainScreen.FoodState
+import com.example.food.presentation.mainScreen.FoodViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher

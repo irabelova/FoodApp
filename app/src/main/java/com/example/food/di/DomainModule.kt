@@ -11,5 +11,5 @@ abstract class DomainModule {
     abstract fun bindLocalDataSource(source: DataBaseDataSource): LocalDataSource
 
     @Binds
-    abstract fun bindDataSource(source: RapidApiDataSource): DataSource
+    abstract fun bindDataSource(source: FakeDataSource): DataSource
 }

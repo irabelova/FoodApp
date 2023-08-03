@@ -1,4 +1,4 @@
-package com.example.food.presentation
+package com.example.food.presentation.mainScreen
 
 import com.example.food.domain.models.Category
 import com.example.food.domain.models.Food

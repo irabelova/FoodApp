@@ -10,6 +10,8 @@
     <color name="titleText">#222831</color>
     <color name="descriptionText">#AAAAAD</color>
     <color name="outlineColor">#FD3A69</color>
+    <color name="selectedCategoryBackground">#20FD3A69</color>
+    <color name="selectedCategory">#FACFDB</color>
     <color name="buttonBackground">#FFD8E1</color>
     <color name="inactiveTextButton">#C3C4C9</color>
     <color name="background">#FBFBFB</color>
