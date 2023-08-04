@@ -54,7 +54,6 @@ fun City(
 fun CitiesList(
     modifier: Modifier = Modifier,
     onCitySelected: (String) -> Unit,
-    selectedCity: String = "Москва"
 ) {
     Column(
         modifier = modifier
@@ -65,7 +64,7 @@ fun CitiesList(
             City(
                 text = city,
                 onClickCity = {
-                    onCitySelected(it)}
+                    onCitySelected(it)},
             )
         }
     }
@@ -95,7 +94,6 @@ val citiesList = listOf(
 @Composable
 fun CitiesListPreview() {
     CitiesList(
-        selectedCity = citiesList[0],
         modifier = Modifier,
         onCitySelected = {}
     )

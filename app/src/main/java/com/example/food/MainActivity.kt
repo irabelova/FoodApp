@@ -87,7 +87,12 @@ class MainActivity : AppCompatActivity() {
                 //TODO: to add new screen
             }
             composable(FoodBottomMenuItem.Cities.route) {
-                CitiesList(onCitySelected = {})
+                CitiesList(
+                    onCitySelected = {
+                    navController.popBackStack()
+                        viewModel.changeCity(it)
+                                     },
+                )
             }
         }
     }
@@ -96,11 +101,15 @@ class MainActivity : AppCompatActivity() {
     @Composable
     private fun FoodApp() {
         val navController = rememberNavController()
+        val selectedCity = viewModel.selectedCity.observeAsState().value
 
 
         Scaffold(
             modifier = Modifier,
-            topBar = { FoodTopBar() },
+            topBar = { FoodTopBar(
+                navController = navController,
+                selectedCity = selectedCity!!
+            ) },
             bottomBar = {
                 FoodBottomNavigationMenu(
                     navController = navController
@@ -109,7 +118,7 @@ class MainActivity : AppCompatActivity() {
         ) { innerPadding ->
             FoodNavHost(
                 navController = navController,
-                modifier = Modifier.padding(innerPadding)
+                modifier = Modifier.padding(innerPadding),
             )
         }
     }

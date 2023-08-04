@@ -26,7 +26,7 @@ fun FoodBottomNavigationMenu(navController: NavController, modifier: Modifier = 
     val items = listOf(
         FoodBottomMenuItem.Menu,
         FoodBottomMenuItem.Profile,
-        FoodBottomMenuItem.Basket,
+        FoodBottomMenuItem.Basket
     )
     val currentBackStack by navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStack?.destination
@@ -39,9 +39,10 @@ fun FoodBottomNavigationMenu(navController: NavController, modifier: Modifier = 
             modifier = Modifier.align(alignment = Alignment.BottomCenter)
         ) {
 
-            items.forEachIndexed { index, item ->
+            items.forEach { item ->
                 val isSelected = currentDestination?.hierarchy?.any {
-                    it.route == item.route} == true
+                    it.route == item.route
+                } == true
                 val color =
                     if (isSelected)
                         colorResource(id = R.color.outlineColor)
@@ -67,11 +68,18 @@ fun FoodBottomNavigationMenu(navController: NavController, modifier: Modifier = 
                     selected = isSelected,
                     onClick = {
                         navController.navigate(item.route) {
-
+                            //Pop up to the start destination of the graph to
+                            //avoid building up a large stack of destinations
+                            //on the back stack as users select items
                             popUpTo(navController.graph.findStartDestination().id) {
                                 saveState = false
                             }
+
+                            //Avoid multiple copies of the same destination when
+                            // reselecting the same item
                             launchSingleTop = true
+
+                            //Restore state when reselecting a previously selected item
                             restoreState = true
                         }
                     }

@@ -1,7 +1,10 @@
 package com.example.food.presentation.mainScreen
 
 import android.util.Log
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.food.domain.Repository
 import com.example.food.domain.models.Category
 import kotlinx.coroutines.launch
@@ -20,8 +23,15 @@ class FoodViewModel @Inject constructor(
     private val _selectedCategory = MutableLiveData<Category>()
     val selectedCategory: LiveData<Category> = _selectedCategory
 
+    private val _selectedCity = MutableLiveData("Москва")
+    val selectedCity: LiveData<String> = _selectedCity
+
     init {
         initialLoading()
+    }
+
+    fun changeCity(selectedCity: String) {
+        _selectedCity.value = selectedCity
     }
 
     fun initialLoading() {
@@ -50,6 +60,7 @@ class FoodViewModel @Inject constructor(
             _foodState.value = loadFoods(category)
         }
     }
+
 
     fun reloadFoods () {
         viewModelScope.launch {

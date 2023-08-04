@@ -13,23 +13,29 @@ import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.food.FoodBottomMenuItem
 import com.example.food.R
 
 
 @Composable
 fun FoodTopBar(
     modifier: Modifier = Modifier,
+    navController: NavController,
+    selectedCity: String = "Москва"
 ) {
-    var selectedCity: String by rememberSaveable { mutableStateOf("Москва") }
-    var expanded: Boolean by rememberSaveable { mutableStateOf(false) }
+
+    val currentBackStack by navController.currentBackStackEntryAsState()
+    val currentDestination = currentBackStack?.destination
+    val isExpanded = currentDestination?.hierarchy?.any {
+        it.route == FoodBottomMenuItem.Cities.route
+    } == true
 
     TopAppBar(
         title = {
@@ -44,9 +50,13 @@ fun FoodTopBar(
                     Text(text = selectedCity)
                     IconButton(
                         onClick = {
-                            expanded = !expanded
+                            if (!isExpanded) {
+                                navController.navigate(FoodBottomMenuItem.Cities.route)
+                            } else {
+                                navController.popBackStack()
+                            }
                         }) {
-                        if (expanded) {
+                        if (isExpanded) {
                             Icon(Icons.Filled.ExpandLess, null)
                         } else {
                             Icon(Icons.Filled.ExpandMore, null)
@@ -65,9 +75,3 @@ fun FoodTopBar(
     )
 }
 
-
-@Preview(showBackground = true)
-@Composable
-fun TopBarPreview() {
-    FoodTopBar()
-}

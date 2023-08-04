@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
@@ -20,7 +19,6 @@ import com.example.food.presentation.ErrorScreen
 import com.example.food.presentation.LoadingScreen
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Food(
     categories: List<Category>,
