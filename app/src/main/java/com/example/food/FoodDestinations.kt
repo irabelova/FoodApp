@@ -35,4 +35,10 @@ sealed class FoodBottomMenuItem(
         text = R.string.menu,
         route = "cities"
     )
+
+    object Banners: FoodBottomMenuItem(
+        imageVector = Icons.Filled.Fastfood,
+        text = R.string.menu,
+        route = "banners/{steps}/{currentStep}"
+    )
 }

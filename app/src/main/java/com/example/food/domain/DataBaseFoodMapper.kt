@@ -14,7 +14,7 @@ class DataBaseFoodMapper @Inject constructor(){
             name = model.name,
             thumbnailUrl = model.thumbnailUrl,
             description = model.description,
-            timeMinutes = model.timeMinutes,
+            price = model.price,
             categoryId = categoryId
         )
 
@@ -31,7 +31,7 @@ class DataBaseFoodMapper @Inject constructor(){
             name = entity.name,
             thumbnailUrl = entity.thumbnailUrl,
             description = entity.description,
-            timeMinutes = entity.timeMinutes,
+            price = entity.price
         )
     fun categoryEntityToCategory(entity: CategoryEntity) =
         Category(

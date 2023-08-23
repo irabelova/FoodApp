@@ -30,60 +30,62 @@ fun FoodBottomNavigationMenu(navController: NavController, modifier: Modifier = 
     )
     val currentBackStack by navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStack?.destination
-
-    Box(
-        modifier = modifier.fillMaxWidth(),
-    ) {
-        BottomNavigation(
-            backgroundColor = colorResource(id = R.color.bottomBackground),
-            modifier = Modifier.align(alignment = Alignment.BottomCenter)
+    val show = items.find { it.route == currentDestination?.route } != null
+    if (show) {
+        Box(
+            modifier = modifier.fillMaxWidth(),
         ) {
+            BottomNavigation(
+                backgroundColor = colorResource(id = R.color.bottomBackground),
+                modifier = Modifier.align(alignment = Alignment.BottomCenter)
+            ) {
 
-            items.forEach { item ->
-                val isSelected = currentDestination?.hierarchy?.any {
-                    it.route == item.route
-                } == true
-                val color =
-                    if (isSelected)
-                        colorResource(id = R.color.outlineColor)
-                    else
-                        colorResource(id = R.color.inactiveItemInBottomMenu)
+                items.forEach { item ->
+                    val isSelected = currentDestination?.hierarchy?.any {
+                        it.route == item.route
+                    } == true
+                    val color =
+                        if (isSelected)
+                            colorResource(id = R.color.outlineColor)
+                        else
+                            colorResource(id = R.color.inactiveItemInBottomMenu)
 
-                BottomNavigationItem(
-                    icon = {
-                        Icon(
-                            modifier = modifier,
-                            imageVector = item.imageVector,
-                            contentDescription = null,
-                            tint = color
-                        )
-                    },
-                    label = {
-                        Text(
-                            modifier = modifier,
-                            text = stringResource(item.text),
-                            color = color
-                        )
-                    },
-                    selected = isSelected,
-                    onClick = {
-                        navController.navigate(item.route) {
-                            //Pop up to the start destination of the graph to
-                            //avoid building up a large stack of destinations
-                            //on the back stack as users select items
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = false
+                    BottomNavigationItem(
+                        icon = {
+                            Icon(
+                                modifier = modifier,
+                                imageVector = item.imageVector,
+                                contentDescription = null,
+                                tint = color
+                            )
+                        },
+                        label = {
+                            Text(
+                                modifier = modifier,
+                                text = stringResource(item.text),
+                                color = color
+                            )
+                        },
+                        selected = isSelected,
+                        onClick = {
+                            navController.navigate(item.route) {
+                                //Pop up to the start destination of the graph to
+                                //avoid building up a large stack of destinations
+                                //on the back stack as users select items
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = false
+                                }
+
+                                //Avoid multiple copies of the same destination when
+                                // reselecting the same item
+                                launchSingleTop = true
+
+                                //Restore state when reselecting a previously selected item
+                                restoreState = true
                             }
-
-                            //Avoid multiple copies of the same destination when
-                            // reselecting the same item
-                            launchSingleTop = true
-
-                            //Restore state when reselecting a previously selected item
-                            restoreState = true
                         }
-                    }
-                )
+                    )
+                }
             }
         }
     }

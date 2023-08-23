@@ -22,4 +22,7 @@ interface FoodDao {
 
     @Query("SELECT * FROM $FOOD_TABLE_NAME WHERE categoryId = :id")
     suspend fun getFoodByCategoryId(id: Long): List<FoodEntity>
+
+    @Query("SELECT * FROM $FOOD_TABLE_NAME WHERE id = :id")
+    fun getFoodItem(id: Long): FoodEntity
 }

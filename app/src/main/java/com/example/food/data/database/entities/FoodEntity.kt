@@ -11,7 +11,8 @@ const val FOOD_TABLE_NAME = "Food"
         ForeignKey(
             entity = CategoryEntity::class,
             parentColumns = arrayOf("id"),
-            childColumns = arrayOf("categoryId")
+            childColumns = arrayOf("categoryId"),
+            onUpdate = ForeignKey.CASCADE
         )
     ]
 )
@@ -21,6 +22,6 @@ data class FoodEntity(
     val name: String,
     val thumbnailUrl: String,
     val description: String,
-    val timeMinutes: Int,
+    val price: Int,
     val categoryId: Long
 )

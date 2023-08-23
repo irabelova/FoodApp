@@ -1,59 +1,98 @@
 package com.example.food.presentation.mainScreen
 
-import androidx.annotation.DrawableRes
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import com.example.food.R
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.food.FoodBottomMenuItem
 
 @Composable
-fun BannerElement(
-    @DrawableRes drawableRes: Int,
-    modifier: Modifier = Modifier
+fun BannerItem(
+    currentPage: Int,
+    listOfScreens: List<@Composable () -> Unit>
 ) {
-    Image(
-        painter = painterResource(id = drawableRes),
-        contentDescription = null,
-        contentScale = ContentScale.FillBounds,
-        modifier = modifier
-            .width(300.dp)
-            .height(112.dp)
-            .clip(RoundedCornerShape(10.dp))
+    Surface(
+        modifier = Modifier
+            .fillMaxSize(),
+        content = listOfScreens[currentPage]
     )
 }
 
 @Composable
-fun Banners(modifier: Modifier = Modifier) {
-    Row(modifier = modifier
-        .horizontalScroll(rememberScrollState())
-        .padding(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        bannersList.forEach { item ->
-            BannerElement(item)
+fun BannerScreen(
+    navController: NavController,
+    bannersList: List<@Composable () -> Unit>,
+    steps: Int,
+    currentStep: Int
+) {
+    val isPressed = remember { mutableStateOf(false) }
+
+    val goToNextScreen = {
+        if (currentStep + 1 < bannersList.size) {
+            navController.navigate("banners/$steps/${currentStep + 1}")
         }
     }
-}
+    val goToPreviousScreen = {
+        if (currentStep - 1 >= 0) navController.popBackStack()
+    }
 
-private val bannersList = listOf (
-    R.drawable.ic_banner1,
-    R.drawable.ic_banner2,
-    R.drawable.ic_banner3
-)
+    BackHandler(
+        enabled = true
+    ) {
+        navController.popBackStack(FoodBottomMenuItem.Menu.route, false)
+    }
 
-@Preview(showBackground = true)
-@Composable
-fun BannersPreview() {
-    Banners(
+    Box(
         modifier = Modifier
+            .fillMaxSize()
+            .pointerInput(Unit) {
+                val maxWidth = this.size.width
+                detectTapGestures(
+                    onPress = {
+                        val pressStartTime = System.currentTimeMillis()
+                        isPressed.value = true
+                        this.tryAwaitRelease()
+                        val pressEndTime = System.currentTimeMillis()
+                        val totalPressTime = pressEndTime - pressStartTime
+                        if (totalPressTime < 200) {
+                            val isTapOnRightThreeQuarters = (it.x > (maxWidth / 4))
+                            if (isTapOnRightThreeQuarters) {
+                                goToNextScreen()
+                            } else {
+                                goToPreviousScreen()
+                            }
+                        }
+                        isPressed.value = false
+                    },
+                )
+            }
+    ) {
+        BannerItem(
+                currentPage = currentStep,
+                listOfScreens = bannersList
+            )
+        BannerProgressBar(steps, currentStep, isPressed.value, goToNextScreen)
+        }
+    }
+
+
+@Preview
+@Composable
+fun BannerScreenPreview() {
+    val navController = rememberNavController()
+    BannerScreen(
+        navController = navController,
+        bannersList = emptyList(),
+        steps = 2,
+        currentStep = 1
     )
 }

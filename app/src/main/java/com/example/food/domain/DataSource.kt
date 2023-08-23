@@ -6,6 +6,8 @@ import com.example.food.domain.models.Food
 interface DataSource {
     suspend fun getCategories(): List<Category>
     suspend fun getFoodsByCategory(category: Category): List<Food>
+
+    suspend fun getFoodItem(id: Long): Food
 }
 
 interface LocalDataSource: DataSource {

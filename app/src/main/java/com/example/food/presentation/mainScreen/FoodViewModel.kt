@@ -23,8 +23,11 @@ class FoodViewModel @Inject constructor(
     private val _selectedCategory = MutableLiveData<Category>()
     val selectedCategory: LiveData<Category> = _selectedCategory
 
-    private val _selectedCity = MutableLiveData("Москва")
+    private val _selectedCity = MutableLiveData("Moscow")
     val selectedCity: LiveData<String> = _selectedCity
+
+    private val _clickedBannerIndex = MutableLiveData(0)
+    val clickedBannerIndex: LiveData<Int> = _clickedBannerIndex
 
     init {
         initialLoading()
@@ -32,6 +35,10 @@ class FoodViewModel @Inject constructor(
 
     fun changeCity(selectedCity: String) {
         _selectedCity.value = selectedCity
+    }
+
+    fun changeBannerIndex(clickedBannerIndex: Int) {
+        _clickedBannerIndex.value = clickedBannerIndex
     }
 
     fun initialLoading() {

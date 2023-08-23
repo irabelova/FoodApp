@@ -1,10 +1,8 @@
 <resources>
     <string name="app_name">Food</string>
-    <string name="moscow">Москва</string>
-    <string name="menu">Меню</string>
-    <string name="profile">Профиль</string>
-    <string name="basket">Корзина</string>
-    <string name="time">10 мин.</string>
-    <string name="ready_in_minutes">%d мин.</string>
+    <string name="menu">Menu</string>
+    <string name="profile">My orders</string>
+    <string name="basket">Basket</string>
+    <string name="not_available">not available</string>
 
 </resources>

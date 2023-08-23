@@ -21,6 +21,6 @@ class NetworkFoodMapper @Inject constructor(){
             name = dto.name,
             thumbnailUrl = dto.thumbnailUrl,
             description = dto.description,
-            timeMinutes = dto.timeMinutes ?: 0
+            price = dto.price ?: 0,
         )
 }

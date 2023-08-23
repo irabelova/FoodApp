@@ -24,4 +24,9 @@ class DataBaseDataSource @Inject constructor(
     override suspend fun getFoodsByCategory(category: Category): List<Food> {
         return foodDao.getFoodByCategoryId(category.id).map { mapper.foodEntityToFood(it) }
     }
+
+    override suspend fun getFoodItem(id: Long): Food {
+        val foodItem = foodDao.getFoodItem(id)
+        return mapper.foodEntityToFood(foodItem)
+    }
 }

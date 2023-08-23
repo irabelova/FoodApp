@@ -23,11 +23,21 @@ class Repository @Inject constructor(
     suspend fun getFoods(category: Category): List<Food> {
         return try {
             val result = dataSource.getFoodsByCategory(category)
-            saveFoods(result, category)
+            saveFoods(result, category.id)
             result
         } catch (ex: Exception) {
             Log.e("Repository", "Error while loading foods", ex)
             localDataSource.getFoodsByCategory(category)
+        }
+    }
+
+    suspend fun getFoodItem(id: Long): Food {
+        return try {
+            val foodItem = dataSource.getFoodItem(id)
+            foodItem
+        } catch (ex: Exception) {
+            Log.e("Repository", "Error while loading foods", ex)
+            localDataSource.getFoodItem(id)
         }
     }
 
@@ -39,9 +49,9 @@ class Repository @Inject constructor(
         }
     }
 
-    private suspend fun saveFoods(food: List<Food>, category: Category) {
+    private suspend fun saveFoods(food: List<Food>, categoryId: Long) {
         try {
-            localDataSource.saveFoodList(food, category.id)
+            localDataSource.saveFoodList(food, categoryId)
         } catch (ex: Exception) {
             Log.e("Repository", "error whole saving foods", ex)
         }

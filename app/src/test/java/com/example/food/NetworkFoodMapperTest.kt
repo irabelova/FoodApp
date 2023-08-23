@@ -27,6 +27,6 @@ internal class NetworkFoodMapperTest {
 
     @Test
     fun `foodDtoToFood with null field`() {
-        assertEquals(foodModel.copy(timeMinutes = 0), mapper.foodDtoToFood(foodDto.copy(timeMinutes = null)))
+        assertEquals(foodModel.copy(price = 0), mapper.foodDtoToFood(foodDto.copy(price = null)))
     }
 }

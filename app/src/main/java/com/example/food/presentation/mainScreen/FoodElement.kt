@@ -10,12 +10,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.SubcomposeAsyncImage
 import com.example.food.presentation.ErrorItem
 import com.example.food.presentation.LoadingScreen
+import java.text.NumberFormat
+import java.util.*
 
 @Composable
 fun FoodElement(
@@ -62,7 +65,10 @@ fun FoodElement(
             Surface(
                 border = BorderStroke(
                     1.dp,
-                    color = colorResource(id = com.example.food.R.color.outlineColor)
+                    color = if (recipeTime == 0)
+                        colorResource(id = com.example.food.R.color.descriptionText)
+                    else
+                        colorResource(id = com.example.food.R.color.outlineColor)
                 ),
                 shape = RoundedCornerShape(8.dp),
                 modifier = Modifier
@@ -73,9 +79,15 @@ fun FoodElement(
             ) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
-                        text = "$recipeTime мин.",
+                        text = if (recipeTime == 0)
+                            stringResource(id = com.example.food.R.string.not_available)
+                        else
+                            NumberFormat.getCurrencyInstance(Locale.US).format(recipeTime),
                         fontSize = 13.sp,
-                        color = colorResource(id = com.example.food.R.color.outlineColor),
+                        color = if (recipeTime == 0)
+                            colorResource(id = com.example.food.R.color.descriptionText)
+                        else
+                            colorResource(id = com.example.food.R.color.outlineColor),
                         maxLines = 1,
                     )
                 }

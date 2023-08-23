@@ -9,7 +9,7 @@ data class FoodDto(
     val thumbnailUrl: String,
     val description: String,
     @Json(name = "total_time_minutes")
-    val timeMinutes: Int?,
+    val price: Int?,
 )
 
 data class FoodResultDto(

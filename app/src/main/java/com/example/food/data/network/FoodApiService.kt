@@ -3,6 +3,7 @@ package com.example.food.data.network
 import com.example.food.BuildConfig.API_HOST
 import com.example.food.BuildConfig.API_KEY
 import com.example.food.data.network.dto.CategoriesDto
+import com.example.food.data.network.dto.FoodDto
 import com.example.food.data.network.dto.FoodResultDto
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -24,4 +25,11 @@ interface FoodApiService {
         @Query("size") size: Int = 5,
         @Query("tags") tag: String
     ): FoodResultDto
+
+    @GET("recipes/get-more-info")
+    suspend fun getFoodItem(
+        @Header("X-RapidAPI-Key") key: String = API_KEY,
+        @Header("X-RapidAPI-Host") host: String = API_HOST,
+        @Query("id") id: Long
+    ): FoodDto
 }

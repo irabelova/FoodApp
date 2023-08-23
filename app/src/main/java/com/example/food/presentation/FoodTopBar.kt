@@ -1,4 +1,4 @@
-package com.example.food.presentation.mainScreen
+package com.example.food.presentation
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
@@ -28,7 +28,7 @@ import com.example.food.R
 fun FoodTopBar(
     modifier: Modifier = Modifier,
     navController: NavController,
-    selectedCity: String = "Москва"
+    selectedCity: String = "Moscow"
 ) {
 
     val currentBackStack by navController.currentBackStackEntryAsState()

@@ -78,19 +78,17 @@ fun Categories(
     }
 }
 
-
-val categoryList = listOf(
-    Category(id = 1, name = "italian", displayName = "Italian"),
-    Category(id = 2, name = "chinese", displayName = "Chinese"),
-    Category(id = 3, name = "german", displayName = "German"),
-    Category(id = 4, name = "japanese", displayName = "Japanese"),
-    Category(id = 5, name = "mexican", displayName = "Mexican"),
-    Category(id = 6, name = "american", displayName = "American")
-)
-
 @Preview(showBackground = true)
 @Composable
 fun CategoriesPreview() {
+    val categoryList = listOf(
+        Category(id = 1, name = "italian", displayName = "Italian"),
+        Category(id = 2, name = "chinese", displayName = "Chinese"),
+        Category(id = 3, name = "german", displayName = "German"),
+        Category(id = 4, name = "japanese", displayName = "Japanese"),
+        Category(id = 5, name = "mexican", displayName = "Mexican"),
+        Category(id = 6, name = "american", displayName = "American")
+    )
     Categories(
         categoryList = categoryList,
         selectedCategory = categoryList[1],

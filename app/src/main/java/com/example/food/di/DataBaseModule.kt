@@ -6,10 +6,12 @@ import com.example.food.data.database.FoodDao
 import com.example.food.data.database.FoodDataBase
 import dagger.Module
 import dagger.Provides
+import javax.inject.Singleton
 
 @Module
 class DataBaseModule {
 
+    @Singleton
     @Provides
     fun getDataSource(context: Context): FoodDataBase{
         return Room.databaseBuilder(

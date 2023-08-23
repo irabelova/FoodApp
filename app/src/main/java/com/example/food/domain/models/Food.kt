@@ -5,5 +5,5 @@ data class Food(
     val name: String,
     val thumbnailUrl: String,
     val description: String,
-    val timeMinutes: Int,
+    val price: Int,
 )
