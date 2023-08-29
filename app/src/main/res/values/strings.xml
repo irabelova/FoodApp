@@ -4,5 +4,22 @@
     <string name="profile">My orders</string>
     <string name="basket">Basket</string>
     <string name="not_available">not available</string>
-
+    <string name="premium_quality_title">Premium quality</string>
+    <string name="premium_quality_description">Using fresh, local ingredients and traditional cooking methods, we deliver outstanding taste</string>
+    <string name="competitive_price_title">Competitive price</string>
+    <string name="competitive_price_description">Our service offers exceptional value for money</string>
+    <string name="broad_range_title">Broad range</string>
+    <string name="broad_range_description">Our extensive selection includes salads, soups, stews, pies, pastas and more</string>
+    <string name="packaging_and_delivery_flexibility_title">Packaging and delivery flexibility</string>
+    <string name="packaging_and_delivery_flexibility_description">We work hard to ensure that orders are always delivered on time and in the best condition possible</string>
+    <string name="special_offer">Special offer</string>
+    <string name="ten_percent_off_with_code">10% off with code</string>
+    <string name="promo_code_has_been_applied">Promo code has been applied</string>
+    <string name="save_ten">SAVE10</string>
+    <string name="apply">Apply</string>
+    <string name="free_delivery">Free delivery</string>
+    <string name="for_orders_over_fifty_dollars">for orders over 50$</string>
+    <string name="promo_code_is_not_required">(promo code is not required)</string>
+    <string name="why_choose_us">Why choose us?</string>
+    <string name="thank_you_for_choosing_us">Thank you for choosing us!!</string>
 </resources>

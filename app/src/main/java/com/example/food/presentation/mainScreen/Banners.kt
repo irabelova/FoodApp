@@ -8,6 +8,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,17 +33,27 @@ fun BannerScreen(
     navController: NavController,
     bannersList: List<@Composable () -> Unit>,
     steps: Int,
-    currentStep: Int
+    index: Int
 ) {
     val isPressed = remember { mutableStateOf(false) }
+    val currentStep = rememberSaveable { mutableStateOf(0) }
 
-    val goToNextScreen = {
-        if (currentStep + 1 < bannersList.size) {
-            navController.navigate("banners/$steps/${currentStep + 1}")
+    val goToNextScreen: () -> Unit = {
+        if (index + 1 < bannersList.size) {
+            navController.navigate("banners/$steps/${index + 1}")
+            currentStep.value++
+        } else {
+            navController.popBackStack(FoodBottomMenuItem.Menu.route, false)
         }
     }
     val goToPreviousScreen = {
-        if (currentStep - 1 >= 0) navController.popBackStack()
+        if (index > 0 && index!=currentStep.value) {
+            navController.navigate("banners/$steps/${index - 1}")
+        }
+        else if (index > 0) {
+            navController.popBackStack()
+        }
+        currentStep.value--
     }
 
     BackHandler(
@@ -77,11 +88,11 @@ fun BannerScreen(
             }
     ) {
         BannerItem(
-                currentPage = currentStep,
+                currentPage = index,
                 listOfScreens = bannersList
             )
-        BannerProgressBar(steps, currentStep, isPressed.value, goToNextScreen)
-        }
+        BannerProgressBar(steps, index, isPressed.value, goToNextScreen)
+    }
     }
 
 
@@ -93,6 +104,6 @@ fun BannerScreenPreview() {
         navController = navController,
         bannersList = emptyList(),
         steps = 2,
-        currentStep = 1
+        index = 1
     )
 }

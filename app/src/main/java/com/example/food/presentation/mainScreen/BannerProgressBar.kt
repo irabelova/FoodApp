@@ -19,9 +19,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.food.R
 
 @Composable
 fun BannerProgressBar(
@@ -48,8 +51,15 @@ fun BannerProgressBar(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .height(48.dp)
-            .padding(24.dp, 0.dp),
-
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        colorResource(id = R.color.descriptionText),
+                        Color.Transparent,
+                    )
+                ),
+            )
+            .padding(24.dp, 0.dp)
         ) {
         for (index in 0 until steps) {
             Row(

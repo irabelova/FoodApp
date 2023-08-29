@@ -39,9 +39,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private val bannersList = listOf<@Composable () -> Unit>(
-        { BannerElement1() },
-        { BannerElement2() },
-        { BannerElement3() }
+        { FreeDeliveryBanner() },
+        { WhyChooseUsBanner() },
+        { SpecialOfferBanner() }
     )
 
     @SuppressLint("SuspiciousIndentation")
@@ -118,7 +118,7 @@ class MainActivity : AppCompatActivity() {
                     navController = navController,
                     bannersList = bannersList,
                     steps = backStackEntry.arguments!!.getInt("steps"),
-                    currentStep = backStackEntry.arguments!!.getInt("currentStep")
+                    index = backStackEntry.arguments!!.getInt("currentStep")
                 )
             }
         }
