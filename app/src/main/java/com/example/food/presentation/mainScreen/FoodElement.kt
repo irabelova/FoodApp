@@ -1,6 +1,7 @@
 package com.example.food.presentation.mainScreen
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
@@ -24,13 +25,18 @@ import java.util.*
 fun FoodElement(
     modifier: Modifier = Modifier,
     imageURl: String,
-    recipeName: String,
-    recipeDescription: String,
-    recipeTime: Int,
+    title: String,
+    description: String,
+    price: Int,
+    onItemClicked: () -> Unit
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable {
+                onItemClicked()
+            }
     ) {
         SubcomposeAsyncImage(
             model = imageURl,
@@ -47,14 +53,14 @@ fun FoodElement(
                 .fillMaxWidth()
         ) {
             Text(
-                text = recipeName,
+                text = title,
                 fontSize = 16.sp,
                 color = colorResource(id = com.example.food.R.color.titleText),
                 maxLines = 1,
                 modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
             )
             Text(
-                text = recipeDescription,
+                text = description,
                 fontSize = 14.sp,
                 color = colorResource(id = com.example.food.R.color.descriptionText),
                 maxLines = 4,
@@ -65,7 +71,7 @@ fun FoodElement(
             Surface(
                 border = BorderStroke(
                     1.dp,
-                    color = if (recipeTime == 0)
+                    color = if (price == 0)
                         colorResource(id = com.example.food.R.color.descriptionText)
                     else
                         colorResource(id = com.example.food.R.color.outlineColor)
@@ -79,12 +85,12 @@ fun FoodElement(
             ) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
-                        text = if (recipeTime == 0)
+                        text = if (price == 0)
                             stringResource(id = com.example.food.R.string.not_available)
                         else
-                            NumberFormat.getCurrencyInstance(Locale.US).format(recipeTime),
+                            NumberFormat.getCurrencyInstance(Locale.US).format(price),
                         fontSize = 13.sp,
-                        color = if (recipeTime == 0)
+                        color = if (price == 0)
                             colorResource(id = com.example.food.R.color.descriptionText)
                         else
                             colorResource(id = com.example.food.R.color.outlineColor),
@@ -101,9 +107,10 @@ fun FoodElement(
 @Composable
 fun FoodElementPreview() {
     FoodElement(
-        recipeName = "Soup",
-        recipeDescription = "Description how to cook soup, Description how to cook soup, Description how to cook soup, Description how to cook soup, Description how to cook soup, Description how to cook soup",
-        recipeTime = 10,
-        imageURl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4ehfDVe_Y5YuvJ7oc14SWbndJyWn5Ya49cQ&usqp=CAU"
+        title = "Soup",
+        description = "Description how to cook soup, Description how to cook soup, Description how to cook soup, Description how to cook soup, Description how to cook soup, Description how to cook soup",
+        price = 10,
+        imageURl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4ehfDVe_Y5YuvJ7oc14SWbndJyWn5Ya49cQ&usqp=CAU",
+        onItemClicked = {}
     )
 }

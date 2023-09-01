@@ -74,9 +74,12 @@ fun Food(
                         FoodElement(
                             modifier = Modifier.padding(16.dp),
                             imageURl = food.thumbnailUrl,
-                            recipeName = food.name,
-                            recipeDescription = food.description,
-                            recipeTime = food.price
+                            title = food.name,
+                            description = food.description,
+                            price = food.price,
+                            onItemClicked = {
+                                navController.navigate("foodItem/${food.id}")
+                            }
                         )
                     }
                     FoodState.Error -> item {

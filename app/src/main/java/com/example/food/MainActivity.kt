@@ -24,6 +24,8 @@ import com.example.food.presentation.ErrorScreen
 import com.example.food.presentation.FoodBottomNavigationMenu
 import com.example.food.presentation.FoodTopBar
 import com.example.food.presentation.LoadingScreen
+import com.example.food.presentation.foodItemScreen.FoodItemScreen
+import com.example.food.presentation.foodItemScreen.FoodItemViewModel
 import com.example.food.presentation.mainScreen.*
 import javax.inject.Inject
 
@@ -33,6 +35,9 @@ class MainActivity : AppCompatActivity() {
 
     @Inject
     protected lateinit var providerFactory: ViewModelProviderFactory
+
+    @Inject
+    lateinit var factory: FoodItemViewModel.Factory
 
     private val viewModel: FoodViewModel by viewModels {
         providerFactory
@@ -74,9 +79,11 @@ class MainActivity : AppCompatActivity() {
                 onCategorySelected = { viewModel.changeCategory(it) },
                 onReloadFood = { viewModel.reloadFoods() }
             )
+
             CategoryState.InitialLoadingError -> ErrorScreen(
                 onButtonClicked = { viewModel.initialLoading() }
             )
+
             else -> {}
         }
     }
@@ -108,10 +115,11 @@ class MainActivity : AppCompatActivity() {
                     },
                 )
             }
-            composable(FoodBottomMenuItem.Banners.route,
+            composable(
+                FoodBottomMenuItem.Banners.route,
                 arguments = listOf(
-                    navArgument("steps") { type = NavType.IntType},
-                    navArgument("currentStep") { type = NavType.IntType},
+                    navArgument("steps") { type = NavType.IntType },
+                    navArgument("currentStep") { type = NavType.IntType },
                 )
             ) { backStackEntry ->
                 BannerScreen(
@@ -119,6 +127,17 @@ class MainActivity : AppCompatActivity() {
                     bannersList = bannersList,
                     steps = backStackEntry.arguments!!.getInt("steps"),
                     index = backStackEntry.arguments!!.getInt("currentStep")
+                )
+            }
+            composable(
+                FoodBottomMenuItem.FoodItem.route,
+                arguments = listOf(
+                    navArgument(FOOD_ITEM_ID) { type = NavType.LongType },
+                )
+            ) {
+                FoodItemScreen(
+                    navController = navController,
+                    factory = factory
                 )
             }
         }

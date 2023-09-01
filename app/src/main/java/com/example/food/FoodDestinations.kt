@@ -7,6 +7,8 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.ShoppingBasket
 import androidx.compose.ui.graphics.vector.ImageVector
 
+const val FOOD_ITEM_ID = "FOOD_ITEM_ID"
+
 sealed class FoodBottomMenuItem(
     val imageVector: ImageVector,
     @StringRes val text: Int,
@@ -40,5 +42,11 @@ sealed class FoodBottomMenuItem(
         imageVector = Icons.Filled.Fastfood,
         text = R.string.menu,
         route = "banners/{steps}/{currentStep}"
+    )
+
+    object FoodItem: FoodBottomMenuItem(
+        imageVector = Icons.Filled.Fastfood,
+        text = R.string.menu,
+        route = "foodItem/{$FOOD_ITEM_ID}"
     )
 }
