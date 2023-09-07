@@ -22,6 +22,9 @@ class FoodItemViewModel @AssistedInject constructor(
     private val _foodItemState = MutableLiveData<FoodItemUiModel>()
     val foodItemState: LiveData<FoodItemUiModel> = _foodItemState
 
+    private val _quantity = MutableLiveData(1)
+    val quantity: LiveData<Int> = _quantity
+
     val id: Long = savedStateHandle[FOOD_ITEM_ID]!!
 
 
@@ -42,6 +45,16 @@ class FoodItemViewModel @AssistedInject constructor(
             }
         }
     }
+
+    fun changeQuantityCounter(isIncreased: Boolean) {
+        if (isIncreased) {
+            _quantity.value = _quantity.value!! + 1
+        }
+        else {
+            _quantity.value = _quantity.value!! - 1
+        }
+    }
+
     @AssistedFactory
     interface Factory : ViewModelAssistedFactory<FoodItemViewModel>
 }

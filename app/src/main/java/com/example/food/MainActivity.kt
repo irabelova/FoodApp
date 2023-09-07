@@ -20,6 +20,7 @@ import androidx.navigation.navArgument
 import com.example.food.di.AppComponent
 import com.example.food.di.DaggerAppComponent
 import com.example.food.di.ViewModelProviderFactory
+import com.example.food.di.assistedViewModel
 import com.example.food.presentation.ErrorScreen
 import com.example.food.presentation.FoodBottomNavigationMenu
 import com.example.food.presentation.FoodTopBar
@@ -135,9 +136,14 @@ class MainActivity : AppCompatActivity() {
                     navArgument(FOOD_ITEM_ID) { type = NavType.LongType },
                 )
             ) {
+                val viewModel: FoodItemViewModel by it.assistedViewModel { saveStateHandle ->
+                    factory.create(
+                        saveStateHandle
+                    )
+                }
                 FoodItemScreen(
                     navController = navController,
-                    factory = factory
+                    viewModel = viewModel
                 )
             }
         }

@@ -30,8 +30,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,7 +47,6 @@ import com.example.food.R
 import com.example.food.presentation.ErrorItem
 import com.example.food.presentation.ErrorScreen
 import com.example.food.presentation.LoadingScreen
-import com.example.food.di.assistedViewModel
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -57,22 +54,24 @@ import java.util.Locale
 @Composable
 fun FoodItemScreen(
     navController: NavController,
-    factory: FoodItemViewModel.Factory
+    viewModel: FoodItemViewModel
 ) {
-    val viewModel: FoodItemViewModel by navController.currentBackStackEntry!!.assistedViewModel {
-        factory.create(
-            it
-        )
-    }
 
-    when (val foodItemState = viewModel.foodItemState.observeAsState().value) {
+
+    val foodItemState = viewModel.foodItemState.observeAsState().value
+    val quantity = viewModel.quantity.observeAsState().value
+
+    when (foodItemState) {
         FoodItemUiModel.Loading -> LoadingScreen()
-        is FoodItemUiModel.Data -> FoodItem(
-            imageURl = foodItemState.foodItem.thumbnailUrl,
-            title = foodItemState.foodItem.name,
-            description = foodItemState.foodItem.description,
-            price = foodItemState.foodItem.price
-        )
+        is FoodItemUiModel.Data ->
+            FoodItem(
+                imageURl = foodItemState.foodItem.thumbnailUrl,
+                title = foodItemState.foodItem.name,
+                description = foodItemState.foodItem.description,
+                price = foodItemState.foodItem.price,
+                onQuantityChanged = {viewModel.changeQuantityCounter(it)},
+                quantity = quantity!!
+            )
 
         FoodItemUiModel.Error -> ErrorScreen(
             onButtonClicked = { viewModel.getFoodItem() }
@@ -87,7 +86,9 @@ fun FoodItem(
     imageURl: String,
     title: String,
     description: String,
-    price: Int
+    price: Int,
+    onQuantityChanged: (Boolean) -> Unit,
+    quantity: Int
 ) {
     Column(
         modifier = Modifier.fillMaxSize()
@@ -123,10 +124,16 @@ fun FoodItem(
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold
                 )
-                PriceAndQuantityCounter(
-                    modifier = Modifier.padding(vertical = 10.dp),
-                    price = price
-                )
+                if (price != 0) {
+                    PriceAndQuantityCounter(
+                        modifier = Modifier.padding(vertical = 10.dp),
+                        price = price,
+                        onQuantityChanged = onQuantityChanged,
+                        quantity = quantity
+                    )
+                }
+                else
+                    NotAvailableFood(modifier = Modifier.padding(vertical = 10.dp))
                 Divider(
                     color = colorResource(id = R.color.descriptionText),
                     thickness = 1.dp
@@ -186,9 +193,10 @@ fun FoodItem(
 @Composable
 fun PriceAndQuantityCounter(
     modifier: Modifier,
-    price: Int
+    price: Int,
+    onQuantityChanged: (Boolean) -> Unit,
+    quantity: Int
 ) {
-    val counter = remember { mutableStateOf(1) }
     Row(
         modifier = modifier
             .fillMaxWidth(),
@@ -196,14 +204,8 @@ fun PriceAndQuantityCounter(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = if (price == 0)
-                stringResource(id = R.string.not_available)
-            else
-                NumberFormat.getCurrencyInstance(Locale.US).format(price),
-            color = if (price == 0)
-                colorResource(id = R.color.descriptionText)
-            else
-                colorResource(id = R.color.outlineColor),
+            text = NumberFormat.getCurrencyInstance(Locale.US).format(price*quantity),
+            color = colorResource(id = R.color.outlineColor),
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold
         )
@@ -220,9 +222,10 @@ fun PriceAndQuantityCounter(
                     .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = {
-                    counter.value--
-                }) {
+                IconButton(
+                    enabled = quantity > 1,
+                    onClick = { onQuantityChanged(false) }
+                ) {
                     Icon(
                         imageVector = Icons.Filled.Remove,
                         contentDescription = "",
@@ -231,15 +234,16 @@ fun PriceAndQuantityCounter(
                 }
 
                 Text(
-                    text = "${counter.value}",
+                    text = "$quantity",
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp
                 )
 
-                IconButton(onClick = {
-                    counter.value++
-                }) {
+                IconButton(
+                    enabled = quantity < 10,
+                    onClick = { onQuantityChanged(true) }
+                ) {
                     Icon(
                         imageVector = Icons.Filled.Add,
                         contentDescription = "",
@@ -251,11 +255,26 @@ fun PriceAndQuantityCounter(
     }
 }
 
+@Composable
+fun NotAvailableFood(
+    modifier: Modifier,
+) {
+    Text(
+        modifier = modifier,
+        text = stringResource(id = R.string.not_available),
+        color = colorResource(id = R.color.descriptionText),
+        fontSize = 18.sp,
+        fontWeight = FontWeight.Bold
+    )
+}
+
 @Preview(showBackground = true)
 @Composable
 fun FoodItemPreview() {
     FoodItem(
         title = "Soup",
+        onQuantityChanged = {},
+        quantity = 1,
         description = "Description how to cook soup, Description how to cook soupDescription how to cook soup, Description how to cook soup, Description how to cook soup, Description how to cook soup, Description how to cook soup, Description how to cook soup Description how to cook soup, Description how to cook soupDescription how to cook soup, Description how to cook soup, Description how to cook soup, Description how to cook soup, Description how to cook soup, Description how to cook soup",
         price = 10,
         imageURl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4ehfDVe_Y5YuvJ7oc14SWbndJyWn5Ya49cQ&usqp=CAU"
