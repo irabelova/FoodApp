@@ -15,13 +15,12 @@ class NetworkFoodMapper @Inject constructor(){
             displayName = dto.displayName
         )
 
-    fun foodDtoToFood(dto: FoodDto, categoryId: Long) =
+    fun foodDtoToFood(dto: FoodDto) =
         Food(
             id = dto.id,
             name = dto.name,
             thumbnailUrl = dto.thumbnailUrl,
             description = dto.description,
             price = dto.price ?: 0,
-            categoryId = categoryId
         )
 }

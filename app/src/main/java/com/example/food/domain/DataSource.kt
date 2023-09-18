@@ -1,21 +1,27 @@
 package com.example.food.domain
 
+import com.example.food.domain.models.CartItem
 import com.example.food.domain.models.Category
 import com.example.food.domain.models.Food
+import kotlinx.coroutines.flow.Flow
 
 interface DataSource {
     suspend fun getCategories(): List<Category>
     suspend fun getFoodsByCategory(category: Category): List<Food>
 
-    suspend fun getFoodItem(id: Long, categoryId: Long): Food
+    suspend fun getFoodItem(id: Long): Food
 }
 
 interface LocalDataSource: DataSource {
     suspend fun saveCategories(categories: List<Category>)
-    suspend fun saveFoodList(food: List<Food>)
+    suspend fun saveFoodList(food: List<Food>, categoryId: Long)
 
-    suspend fun updateCartItem(foodItem: Food)
+    suspend fun saveItemToCart(cartItem: CartItem)
 
-    suspend fun getCartItems(): List<Food>
+    suspend fun updateCartItem(foodId: Long, quantity: Int)
+
+    suspend fun deleteCartItem (cartItem: CartItem)
+
+    fun getCartItems(): Flow<List<CartItem>>
 
 }

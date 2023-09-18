@@ -31,8 +31,8 @@ import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -63,7 +63,7 @@ import com.example.food.utils.priceFormatter
 fun CheckoutScreen(
     checkoutViewModel: CheckoutViewModel
 ) {
-    val cartItemsState = checkoutViewModel.cartItemsState.observeAsState().value
+    val cartItemsState = checkoutViewModel.cartItemsStateFlow.collectAsState(CartItemsUiModel.Loading).value
 
     Scaffold(
         modifier = Modifier,
@@ -114,18 +114,18 @@ fun CheckoutScreen(
                             is CartItemsUiModel.Data -> {
                                 items(
                                     cartItemsState.cartItems
-                                ) { cartItem ->
+                                ) { foodCartItem ->
                                     if (cartItemsState.cartItems.isNotEmpty()) {
                                         ShoppingCartItem(
-                                            imageUrl = cartItem.thumbnailUrl,
-                                            title = cartItem.name,
-                                            quantity = cartItem.quantity,
-                                            price = cartItem.price,
+                                            imageUrl = foodCartItem.food.thumbnailUrl,
+                                            title = foodCartItem.food.name,
+                                            quantity = foodCartItem.cartItem.quantity,
+                                            price = foodCartItem.food.price,
                                             onItemClicked = {},
                                             onQuantityChanged = {
                                                 checkoutViewModel.changeQuantity(
                                                     it,
-                                                    cartItem
+                                                    foodCartItem
                                                 )
                                             }
                                         )
@@ -143,8 +143,6 @@ fun CheckoutScreen(
                                     onButtonClicked = {} //TODO
                                 )
                             }
-
-                            else -> {}
                         }
                     }
                 }
@@ -241,10 +239,10 @@ fun ApplyCoupon() {
                 .fillMaxWidth()
         ) {
 
-            var applycode by remember { mutableStateOf("") }
+            var applyCode by remember { mutableStateOf("") }
 
             TextField(
-                value = applycode,
+                value = applyCode,
 
                 colors = TextFieldDefaults.textFieldColors(
                     backgroundColor = Color.White,
@@ -264,7 +262,7 @@ fun ApplyCoupon() {
                 },
                 shape = RoundedCornerShape(8.dp),
                 onValueChange = {
-                    applycode = it
+                    applyCode = it
                 }
             )
             Button(

@@ -1,16 +1,16 @@
 package com.example.food.presentation.checkoutScreen
 
-import com.example.food.domain.models.Food
+import com.example.food.domain.models.FoodCartItem
 
 
 sealed interface CartItemsUiModel {
     object Loading: CartItemsUiModel
-    data class Data(val cartItems: List<Food>): CartItemsUiModel {
+    data class Data(val cartItems: List<FoodCartItem>): CartItemsUiModel {
         val totalQuantityOfItems : Int
             get() {
                 var totalQuantity = 0
                 cartItems.forEach {
-                    totalQuantity += it.quantity
+                    totalQuantity += it.cartItem.quantity
                 }
                 return totalQuantity
             }
@@ -18,7 +18,7 @@ sealed interface CartItemsUiModel {
             get() {
                 var totalPrice = 0
                 cartItems.forEach {
-                    totalPrice += it.quantity * it.price
+                    totalPrice += it.cartItem.quantity * it.food.price
                 }
                 return totalPrice
             }

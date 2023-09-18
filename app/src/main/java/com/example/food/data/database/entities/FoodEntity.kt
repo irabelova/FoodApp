@@ -23,7 +23,5 @@ data class FoodEntity(
     val thumbnailUrl: String,
     val description: String,
     val price: Int,
-    val categoryId: Long,
-    val quantity: Int,
-    val isAddedToCart: Boolean
+    val categoryId: Long
 )

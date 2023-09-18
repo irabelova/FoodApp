@@ -1,8 +1,12 @@
 package com.example.food.domain
 
 import android.util.Log
+import com.example.food.domain.models.CartItem
 import com.example.food.domain.models.Category
 import com.example.food.domain.models.Food
+import com.example.food.domain.models.FoodCartItem
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class Repository @Inject constructor(
@@ -23,7 +27,7 @@ class Repository @Inject constructor(
     suspend fun getFoods(category: Category): List<Food> {
         return try {
             val result = dataSource.getFoodsByCategory(category)
-            saveFoods(result)
+            saveFoods(result, category.id)
             result
         } catch (ex: Exception) {
             Log.e("Repository", "Error while loading foods", ex)
@@ -31,32 +35,36 @@ class Repository @Inject constructor(
         }
     }
 
-    suspend fun getFoodItem(id: Long, categoryId: Long): Food {
+    suspend fun getFoodItem(id: Long): Food {
         return try {
-            val foodItem = localDataSource.getFoodItem(id, categoryId)
+            val foodItem = localDataSource.getFoodItem(id)
             foodItem
         } catch (ex: Exception) {
             Log.e("Repository", "Error while loading foods", ex)
-            dataSource.getFoodItem(id, categoryId)
-        }
-    }
-
-    suspend fun updateCartItem(foodItem: Food) {
-        try {
-            localDataSource.updateCartItem(foodItem)
-        } catch (ex: Exception) {
-            Log.e("Repository", "error while updating cart item", ex)
+            dataSource.getFoodItem(id)
         }
     }
 
 
-    suspend fun getCartItems(): List<Food>  {
-        try {
-            return localDataSource.getCartItems()
-        } catch (ex: Exception) {
-            Log.e("Repository", "error while getting cart items", ex)
-            throw IllegalArgumentException()
-        }
+     fun getFoodCartItems(): Flow<List<FoodCartItem>> {
+            return localDataSource.getCartItems().map {
+                it.map {cartItem ->
+                    val food = getFoodItem(cartItem.foodId)
+                    FoodCartItem(cartItem, food)
+                }
+            }
+    }
+
+    suspend fun updateCartItem(foodId: Long, quantity: Int) {
+        localDataSource.updateCartItem(foodId, quantity)
+    }
+
+    suspend fun saveCartItem (cartItem: CartItem) {
+        localDataSource.saveItemToCart(cartItem)
+    }
+
+    suspend fun deleteCartItem(cartItem: CartItem) {
+        localDataSource.deleteCartItem(cartItem)
     }
 
 
@@ -68,9 +76,9 @@ class Repository @Inject constructor(
         }
     }
 
-    private suspend fun saveFoods(food: List<Food>) {
+    private suspend fun saveFoods(food: List<Food>, categoryId: Long) {
         try {
-            localDataSource.saveFoodList(food)
+            localDataSource.saveFoodList(food, categoryId)
         } catch (ex: Exception) {
             Log.e("Repository", "error while saving foods", ex)
         }

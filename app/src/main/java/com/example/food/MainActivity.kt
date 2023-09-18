@@ -113,9 +113,7 @@ class MainActivity : AppCompatActivity() {
             }
             composable(FoodBottomMenuItem.ShoppingCart.route) {
                 val checkoutViewModel: CheckoutViewModel = viewModel(factory = providerFactory)
-//                 val checkoutViewModel: CheckoutViewModel by viewModels {
-//                    providerFactory
-//                }
+
 
                 CheckoutScreen(
                     checkoutViewModel
@@ -146,8 +144,7 @@ class MainActivity : AppCompatActivity() {
             composable(
                 FoodBottomMenuItem.FoodItem.route,
                 arguments = listOf(
-                    navArgument(FOOD_ITEM_ID) { type = NavType.LongType },
-                    navArgument(CATEGORY_ID) { type = NavType.LongType }
+                    navArgument(FOOD_ITEM_ID) { type = NavType.LongType }
                 )
             ) {
                 val viewModel: FoodItemViewModel by it.assistedViewModel { saveStateHandle ->

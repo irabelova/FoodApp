@@ -13,11 +13,11 @@ class RapidApiDataSource @Inject constructor(
         service.getCategories().results.filter { it.type == CATEGORY_TYPE }.map { mapper.categoryDtoToCategory(it) }
 
     override suspend fun getFoodsByCategory(category: Category): List<Food> =
-        service.getFoods(tag = category.name).results.map { mapper.foodDtoToFood(it, category.id) }
+        service.getFoods(tag = category.name).results.map { mapper.foodDtoToFood(it) }
 
-    override suspend fun getFoodItem(id: Long, categoryId: Long): Food {
+    override suspend fun getFoodItem(id: Long): Food {
         val foodItem = service.getFoodItem(id = id)
-        return mapper.foodDtoToFood(foodItem, categoryId)
+        return mapper.foodDtoToFood(foodItem)
     }
 
     private companion object {

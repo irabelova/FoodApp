@@ -6,7 +6,4 @@ data class Food(
     val thumbnailUrl: String,
     val description: String,
     val price: Int,
-    val quantity: Int = 1,
-    val isAddedToCart: Boolean = false,
-    val categoryId: Long
 )

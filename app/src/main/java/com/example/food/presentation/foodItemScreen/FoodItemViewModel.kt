@@ -1,19 +1,20 @@
 package com.example.food.presentation.foodItemScreen
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.food.CATEGORY_ID
 import com.example.food.FOOD_ITEM_ID
 import com.example.food.di.ViewModelAssistedFactory
 import com.example.food.domain.Repository
-import com.example.food.domain.models.Food
+import com.example.food.domain.models.CartItem
+import com.example.food.domain.models.FoodCartItem
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 class FoodItemViewModel @AssistedInject constructor(
@@ -21,59 +22,97 @@ class FoodItemViewModel @AssistedInject constructor(
     @Assisted private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _foodItemState = MutableLiveData<FoodItemUiModel>()
-    val foodItemState: LiveData<FoodItemUiModel> = _foodItemState
+
+    private val isLoading = MutableStateFlow(false)
+    private val isError = MutableStateFlow(false)
 
     val id: Long = savedStateHandle[FOOD_ITEM_ID]!!
-    val categoryId: Long = savedStateHandle[CATEGORY_ID]!!
+    private var isAddedToCart = false
 
+    private val cartItemFlow = MutableStateFlow<FoodCartItem?>(null)
+
+
+    val foodItemStateFlow: Flow<FoodItemUiModel> =
+        combine(
+            repository.getFoodCartItems(),
+            cartItemFlow,
+            isLoading,
+            isError
+        ) { repositoryItems, cartItem, loading, error ->
+            when {
+                loading -> FoodItemUiModel.Loading
+                error -> FoodItemUiModel.Error
+                else -> {
+                    val found =  repositoryItems.find { it.food.id == id }
+                    isAddedToCart = found != null
+                    val foodCartItem = found ?: cartItem
+                    if (foodCartItem != null) FoodItemUiModel.Data(
+                        foodCartItem.food,
+                        foodCartItem.cartItem
+                    )
+                    else FoodItemUiModel.Error
+
+                }
+            }
+        }
 
     init {
-        getFoodItem()
+        loadFoodItem()
     }
 
-    fun addFoodItemToShoppingCart(foodItem: Food) {
+    fun loadFoodItem() {
         viewModelScope.launch {
             try {
-                _foodItemState.value = FoodItemUiModel.Data(foodItem)
-                repository.updateCartItem(foodItem)
+                isLoading.value = true
+                cartItemFlow.value = FoodCartItem(CartItem(0, id, 1), repository.getFoodItem(id))
+            } catch (e: Throwable) {
+                Log.e("FoodItemViewModel", "load food item error", e)
+                isError.value = true
+            } finally {
+                isLoading.value = false
+            }
+
+
+        }
+    }
+
+
+    fun addFoodItemToShoppingCart() {
+        viewModelScope.launch {
+            try {
+                repository.saveCartItem(cartItemFlow.value!!.cartItem)
             } catch (e: Exception) {
                 Log.e("FoodItemViewModel", "add to cart error", e)
             }
         }
     }
 
-    fun getFoodItem() {
-        viewModelScope.launch {
-            _foodItemState.value = FoodItemUiModel.Loading
-            try {
-                val foodItem = repository.getFoodItem(id, categoryId)
-                _foodItemState.value = FoodItemUiModel.Data(foodItem)
-            } catch (e: Exception) {
-                Log.e("FoodItemViewModel", "", e)
-                _foodItemState.value = FoodItemUiModel.Error
-            }
-        }
-    }
 
-    fun changeQuantityCounter(isIncreased: Boolean, foodItem: Food) {
-        var quantity = foodItem.quantity
+    fun changeQuantityCounter(isIncreased: Boolean) {
+        val foodCartItem = cartItemFlow.value!!
+        val cartItem = foodCartItem.cartItem
+        var quantity = cartItem.quantity
         if (isIncreased) {
-            _foodItemState.value = FoodItemUiModel.Data(foodItem.copy(quantity = quantity+1))
             quantity++
         } else {
-            _foodItemState.value = FoodItemUiModel.Data(foodItem.copy(quantity = quantity-1))
             quantity--
         }
-        if (foodItem.isAddedToCart) {
-            updateCartItem(foodItem.copy(quantity = quantity))
+        val updated = cartItem.copy(quantity = quantity)
+        if (isAddedToCart) {
+            updateCartItem(id, quantity)
         }
+            cartItemFlow.value = foodCartItem.copy(cartItem = updated)
     }
 
-    private fun updateCartItem(foodItem: Food) {
+    fun clearItem() {
+        val old = cartItemFlow.value
+        cartItemFlow.value = old?.copy(cartItem = CartItem(0, id, 1))
+    }
+
+    private fun updateCartItem(id: Long, quantity: Int) {
         viewModelScope.launch {
             try {
-                repository.updateCartItem(foodItem)
+                repository.updateCartItem(id, quantity)
             } catch (e: Exception) {
                 Log.e("FoodItemViewModel", "error while updating food item", e)
             }

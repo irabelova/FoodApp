@@ -1,6 +1,5 @@
 package com.example.food.presentation.foodItemScreen
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,12 +18,11 @@ import androidx.compose.material.icons.filled.ShoppingBasket
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -48,8 +46,7 @@ fun FoodItemScreen(
     navController: NavController,
     viewModel: FoodItemViewModel
 ) {
-    val context = LocalContext.current
-    val foodItemState = viewModel.foodItemState.observeAsState().value
+    val foodItemState = viewModel.foodItemStateFlow.collectAsState(FoodItemUiModel.Loading).value
 
     when (foodItemState) {
         FoodItemUiModel.Loading -> LoadingScreen()
@@ -59,24 +56,22 @@ fun FoodItemScreen(
                 title = foodItemState.foodItem.name,
                 description = foodItemState.foodItem.description,
                 price = foodItemState.foodItem.price,
-                onQuantityChanged = {viewModel.changeQuantityCounter(it, foodItemState.foodItem)},
-                quantity = foodItemState.foodItem.quantity,
+                onQuantityChanged = {viewModel.changeQuantityCounter(it)},
+                quantity = foodItemState.cartItem.quantity,
                 onClickAddToCart = {
-                    viewModel.addFoodItemToShoppingCart(foodItemState.foodItem.copy(isAddedToCart=true))
-                    Toast
-                        .makeText(context, R.string.items_added_to_cart, Toast.LENGTH_SHORT)
-                        .show()
+                    viewModel.addFoodItemToShoppingCart()
                 },
                 onClickContinueShopping = {navController.navigate(FoodBottomMenuItem.Menu.route)},
-                onClickGoToCart = {navController.navigate(FoodBottomMenuItem.ShoppingCart.route)},
-                isAddedToCart = foodItemState.foodItem.isAddedToCart
+                onClickGoToCart = {
+                    viewModel.clearItem()
+                    navController.navigate(FoodBottomMenuItem.ShoppingCart.route)
+                                  },
+                isAddedToCart = foodItemState.cartItem.isAddedToCart
             )
 
         FoodItemUiModel.Error -> ErrorScreen(
-            onButtonClicked = { viewModel.getFoodItem() }
+            onButtonClicked = { viewModel.loadFoodItem() }
         )
-
-        else -> {}
     }
 }
 
@@ -164,7 +159,9 @@ fun FoodItem(
                         enabled = price != 0,
                         text = R.string.add_to_cart,
                         imageVector = Icons.Default.ArrowForward,
-                        onClick = { onClickAddToCart() }
+                        onClick = {
+                            onClickAddToCart()
+                        }
                     )
                 }
                 else {

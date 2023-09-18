@@ -2,6 +2,7 @@ package com.example.food.di
 
 import android.content.Context
 import androidx.room.Room
+import com.example.food.data.database.CartItemDao
 import com.example.food.data.database.FoodDao
 import com.example.food.data.database.FoodDataBase
 import dagger.Module
@@ -29,8 +30,8 @@ class DataBaseModule {
         return database.foodDao()
     }
 
-//    @Provides
-//    fun provideCartItemDao(database: FoodDataBase): CartItemDao {
-//        return database.cartItemDao()
-//    }
+    @Provides
+    fun provideCartItemDao(database: FoodDataBase): CartItemDao {
+        return database.cartItemDao()
+    }
 }

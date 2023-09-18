@@ -1,87 +1,56 @@
 package com.example.food.presentation.checkoutScreen
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.food.domain.Repository
-import com.example.food.domain.models.Food
+import com.example.food.domain.models.CartItem
+import com.example.food.domain.models.FoodCartItem
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class CheckoutViewModel  @Inject constructor(
+class CheckoutViewModel @Inject constructor(
     private val repository: Repository
 ) : ViewModel() {
 
-    private val _cartItemsState = MutableLiveData<CartItemsUiModel>()
-    val cartItemsState: LiveData<CartItemsUiModel> = _cartItemsState
-
-
-    init {
-        getCartItems()
+    val cartItemsStateFlow = repository.getFoodCartItems().map {
+        CartItemsUiModel.Data(it)
     }
 
-    fun changeQuantity(isIncreased: Boolean, foodItem: Food) {
-        var quantity = foodItem.quantity
-        val data = getData()
 
-        val mutableItems = data.cartItems.toMutableList()
-        val index = mutableItems.indexOf(foodItem)
-        mutableItems.removeAt(index)
-        val updated = if (isIncreased) {
+    fun changeQuantity(isIncreased: Boolean, foodCartItem: FoodCartItem) {
+        var quantity = foodCartItem.cartItem.quantity
+        if (isIncreased) {
             quantity++
-            foodItem.copy(quantity = quantity)
         } else {
             quantity--
-            var item = foodItem
-            item = if (quantity==0) {
-                item.copy(isAddedToCart = false)
-            }else {
-                foodItem.copy(quantity = quantity)
-            }
-            item
-        }
-        updateCartItem(updated)
-        if(quantity != 0) {
-            mutableItems.add(index, updated)
-        }
-        _cartItemsState.value = CartItemsUiModel.Data(mutableItems)
 
+        }
+        if (quantity == 0) {
+            deleteCartItem(foodCartItem.cartItem)
+        } else {
+            updateCartItem(foodCartItem.cartItem.foodId, quantity)
+        }
     }
 
-//    fun getTotalQuantityOfItems(cartItems: List<Food>): Int {
-//        var totalQuantity = 0
-//        cartItems.forEach {
-//            totalQuantity =+ it.quantity
-//        }
-//        return totalQuantity
-//    }
-
-    private fun updateCartItem(foodItem: Food) {
+    private fun deleteCartItem(cartItem: CartItem) {
         viewModelScope.launch {
             try {
-                repository.updateCartItem(foodItem)
+                repository.deleteCartItem(cartItem)
+            } catch (e: Exception) {
+                Log.e("FoodItemViewModel", "error while deleting food item", e)
+            }
+        }
+    }
+
+    private fun updateCartItem(foodId: Long, quantity: Int) {
+        viewModelScope.launch {
+            try {
+                repository.updateCartItem(foodId, quantity)
             } catch (e: Exception) {
                 Log.e("FoodItemViewModel", "error while updating food item", e)
             }
         }
     }
-
-    private fun getCartItems() {
-        viewModelScope.launch {
-            _cartItemsState.value = CartItemsUiModel.Loading
-            try {
-                _cartItemsState.value = CartItemsUiModel.Data(
-                    repository.getCartItems()
-                )
-            } catch (e: Exception) {
-                Log.e("CheckoutViewModel", "", e)
-                _cartItemsState.value = CartItemsUiModel.Error
-            }
-        }
-    }
-
-    private fun getData(): CartItemsUiModel.Data = _cartItemsState.value as CartItemsUiModel.Data
-
 }
