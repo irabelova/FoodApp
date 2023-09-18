@@ -57,6 +57,7 @@ class FakeDataSource @Inject constructor(): DataSource {
         thumbnailUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4ehfDVe_Y5YuvJ7oc14SWbndJyWn5Ya49cQ&usqp=CAU",
         description = "SoupSoup",
         price = 0,
+        categoryId = 1
     )
 
     private val food2 = Food(
@@ -65,6 +66,7 @@ class FakeDataSource @Inject constructor(): DataSource {
         thumbnailUrl = "https://vkusvill.ru/upload/resize/640692/640692_1200x600x90_c.webp",
         description = "PastaPasta",
         price = 15,
+        categoryId = 1
     )
 
     private val food3 = Food(
@@ -73,12 +75,10 @@ class FakeDataSource @Inject constructor(): DataSource {
         thumbnailUrl = "https://www.allrecipes.com/thmb/mvO1mRRH1zTz1SvbwBCTz78CRJI=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/67700_RichPastaforthePoorKitchen_ddmfs_4x3_2284-220302ec8328442096df370dede357d7.jpg",
         description = "Salad",
         price = 25,
+        categoryId = 1
     )
 
     private val foodList = listOf(
-        food1,
-        food2,
-        food3,
         food1,
         food2,
         food3
@@ -94,7 +94,7 @@ class FakeDataSource @Inject constructor(): DataSource {
         return foodList
     }
 
-    override suspend fun getFoodItem(id: Long): Food {
+    override suspend fun getFoodItem(id: Long, categoryId: Long): Food {
         delay(1000)
         return foodList.first { it.id == id }
     }

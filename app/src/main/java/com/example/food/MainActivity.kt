@@ -10,6 +10,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -25,6 +26,8 @@ import com.example.food.presentation.ErrorScreen
 import com.example.food.presentation.FoodBottomNavigationMenu
 import com.example.food.presentation.FoodTopBar
 import com.example.food.presentation.LoadingScreen
+import com.example.food.presentation.checkoutScreen.CheckoutScreen
+import com.example.food.presentation.checkoutScreen.CheckoutViewModel
 import com.example.food.presentation.foodItemScreen.FoodItemScreen
 import com.example.food.presentation.foodItemScreen.FoodItemViewModel
 import com.example.food.presentation.mainScreen.*
@@ -40,9 +43,12 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var factory: FoodItemViewModel.Factory
 
-    private val viewModel: FoodViewModel by viewModels {
+    private val foodViewModel: FoodViewModel by viewModels {
         providerFactory
     }
+
+
+
 
     private val bannersList = listOf<@Composable () -> Unit>(
         { FreeDeliveryBanner() },
@@ -65,9 +71,9 @@ class MainActivity : AppCompatActivity() {
     fun FoodScreen(
         navController: NavController
     ) {
-        val categoriesState = viewModel.categoryState.observeAsState().value
-        val foodState = viewModel.foodState.observeAsState().value
-        val selectedCategory = viewModel.selectedCategory.observeAsState().value
+        val categoriesState = foodViewModel.categoryState.observeAsState().value
+        val foodState = foodViewModel.foodState.observeAsState().value
+        val selectedCategory = foodViewModel.selectedCategory.observeAsState().value
 
         when (categoriesState) {
             CategoryState.InitialLoading -> LoadingScreen()
@@ -77,12 +83,12 @@ class MainActivity : AppCompatActivity() {
                 categories = categoriesState.categories,
                 selectedCategory = selectedCategory,
                 foodState = foodState,
-                onCategorySelected = { viewModel.changeCategory(it) },
-                onReloadFood = { viewModel.reloadFoods() }
+                onCategorySelected = { foodViewModel.changeCategory(it) },
+                onReloadFood = { foodViewModel.reloadFoods() }
             )
 
             CategoryState.InitialLoadingError -> ErrorScreen(
-                onButtonClicked = { viewModel.initialLoading() }
+                onButtonClicked = { foodViewModel.initialLoading() }
             )
 
             else -> {}
@@ -105,14 +111,21 @@ class MainActivity : AppCompatActivity() {
             composable(FoodBottomMenuItem.Profile.route) {
                 //TODO: to add new screen
             }
-            composable(FoodBottomMenuItem.Basket.route) {
-                //TODO: to add new screen
+            composable(FoodBottomMenuItem.ShoppingCart.route) {
+                val checkoutViewModel: CheckoutViewModel = viewModel(factory = providerFactory)
+//                 val checkoutViewModel: CheckoutViewModel by viewModels {
+//                    providerFactory
+//                }
+
+                CheckoutScreen(
+                    checkoutViewModel
+                )
             }
             composable(FoodBottomMenuItem.Cities.route) {
                 CitiesList(
                     onCitySelected = {
                         navController.popBackStack()
-                        viewModel.changeCity(it)
+                        foodViewModel.changeCity(it)
                     },
                 )
             }
@@ -134,6 +147,7 @@ class MainActivity : AppCompatActivity() {
                 FoodBottomMenuItem.FoodItem.route,
                 arguments = listOf(
                     navArgument(FOOD_ITEM_ID) { type = NavType.LongType },
+                    navArgument(CATEGORY_ID) { type = NavType.LongType }
                 )
             ) {
                 val viewModel: FoodItemViewModel by it.assistedViewModel { saveStateHandle ->
@@ -153,7 +167,7 @@ class MainActivity : AppCompatActivity() {
     @Composable
     private fun FoodApp() {
         val navController = rememberNavController()
-        val selectedCity = viewModel.selectedCity.observeAsState().value
+        val selectedCity = foodViewModel.selectedCity.observeAsState().value
 
 
         Scaffold(

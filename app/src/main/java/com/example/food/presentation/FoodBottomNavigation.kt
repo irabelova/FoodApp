@@ -26,7 +26,7 @@ fun FoodBottomNavigationMenu(navController: NavController, modifier: Modifier = 
     val items = listOf(
         FoodBottomMenuItem.Menu,
         FoodBottomMenuItem.Profile,
-        FoodBottomMenuItem.Basket
+        FoodBottomMenuItem.ShoppingCart
     )
     val currentBackStack by navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStack?.destination

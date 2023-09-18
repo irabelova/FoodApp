@@ -2,7 +2,15 @@ package com.example.food.presentation.mainScreen
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -18,8 +26,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.SubcomposeAsyncImage
 import com.example.food.presentation.ErrorItem
 import com.example.food.presentation.LoadingScreen
-import java.text.NumberFormat
-import java.util.*
+import com.example.food.utils.priceFormatter
 
 @Composable
 fun FoodElement(
@@ -88,7 +95,7 @@ fun FoodElement(
                         text = if (price == 0)
                             stringResource(id = com.example.food.R.string.not_available)
                         else
-                            NumberFormat.getCurrencyInstance(Locale.US).format(price),
+                            priceFormatter(price),
                         fontSize = 13.sp,
                         color = if (price == 0)
                             colorResource(id = com.example.food.R.color.descriptionText)

@@ -8,14 +8,16 @@ import javax.inject.Inject
 
 class DataBaseFoodMapper @Inject constructor(){
 
-    fun foodToFoodEntity(model: Food, categoryId: Long) =
+    fun foodToFoodEntity(model: Food) =
         FoodEntity(
             id = model.id,
             name = model.name,
             thumbnailUrl = model.thumbnailUrl,
             description = model.description,
             price = model.price,
-            categoryId = categoryId
+            categoryId = model.categoryId,
+            isAddedToCart = model.isAddedToCart,
+            quantity = model.quantity
         )
 
     fun categoryToCategoryEntity(model: Category) =
@@ -31,7 +33,10 @@ class DataBaseFoodMapper @Inject constructor(){
             name = entity.name,
             thumbnailUrl = entity.thumbnailUrl,
             description = entity.description,
-            price = entity.price
+            price = entity.price,
+            isAddedToCart = entity.isAddedToCart,
+            quantity = entity.quantity,
+            categoryId = entity.categoryId
         )
     fun categoryEntityToCategory(entity: CategoryEntity) =
         Category(

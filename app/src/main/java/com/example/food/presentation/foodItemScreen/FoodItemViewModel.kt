@@ -6,9 +6,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.food.CATEGORY_ID
 import com.example.food.FOOD_ITEM_ID
 import com.example.food.di.ViewModelAssistedFactory
 import com.example.food.domain.Repository
+import com.example.food.domain.models.Food
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -22,23 +24,31 @@ class FoodItemViewModel @AssistedInject constructor(
     private val _foodItemState = MutableLiveData<FoodItemUiModel>()
     val foodItemState: LiveData<FoodItemUiModel> = _foodItemState
 
-    private val _quantity = MutableLiveData(1)
-    val quantity: LiveData<Int> = _quantity
-
     val id: Long = savedStateHandle[FOOD_ITEM_ID]!!
+    val categoryId: Long = savedStateHandle[CATEGORY_ID]!!
 
 
     init {
         getFoodItem()
     }
 
+    fun addFoodItemToShoppingCart(foodItem: Food) {
+        viewModelScope.launch {
+            try {
+                _foodItemState.value = FoodItemUiModel.Data(foodItem)
+                repository.updateCartItem(foodItem)
+            } catch (e: Exception) {
+                Log.e("FoodItemViewModel", "add to cart error", e)
+            }
+        }
+    }
 
     fun getFoodItem() {
         viewModelScope.launch {
             _foodItemState.value = FoodItemUiModel.Loading
             try {
-                _foodItemState.value = FoodItemUiModel.Data(repository.getFoodItem(id))
-
+                val foodItem = repository.getFoodItem(id, categoryId)
+                _foodItemState.value = FoodItemUiModel.Data(foodItem)
             } catch (e: Exception) {
                 Log.e("FoodItemViewModel", "", e)
                 _foodItemState.value = FoodItemUiModel.Error
@@ -46,12 +56,27 @@ class FoodItemViewModel @AssistedInject constructor(
         }
     }
 
-    fun changeQuantityCounter(isIncreased: Boolean) {
+    fun changeQuantityCounter(isIncreased: Boolean, foodItem: Food) {
+        var quantity = foodItem.quantity
         if (isIncreased) {
-            _quantity.value = _quantity.value!! + 1
+            _foodItemState.value = FoodItemUiModel.Data(foodItem.copy(quantity = quantity+1))
+            quantity++
+        } else {
+            _foodItemState.value = FoodItemUiModel.Data(foodItem.copy(quantity = quantity-1))
+            quantity--
         }
-        else {
-            _quantity.value = _quantity.value!! - 1
+        if (foodItem.isAddedToCart) {
+            updateCartItem(foodItem.copy(quantity = quantity))
+        }
+    }
+
+    private fun updateCartItem(foodItem: Food) {
+        viewModelScope.launch {
+            try {
+                repository.updateCartItem(foodItem)
+            } catch (e: Exception) {
+                Log.e("FoodItemViewModel", "error while updating food item", e)
+            }
         }
     }
 

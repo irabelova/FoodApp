@@ -1,40 +1,30 @@
 package com.example.food.presentation.foodItemScreen
 
-import androidx.compose.foundation.background
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.ShoppingBasket
 import androidx.compose.material3.Divider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -43,12 +33,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.SubcomposeAsyncImage
+import com.example.food.FoodBottomMenuItem
 import com.example.food.R
 import com.example.food.presentation.ErrorItem
 import com.example.food.presentation.ErrorScreen
 import com.example.food.presentation.LoadingScreen
-import java.text.NumberFormat
-import java.util.Locale
+import com.example.food.presentation.commonComposables.Counter
+import com.example.food.presentation.commonComposables.StandardButton
+import com.example.food.utils.priceFormatter
 
 
 @Composable
@@ -56,10 +48,8 @@ fun FoodItemScreen(
     navController: NavController,
     viewModel: FoodItemViewModel
 ) {
-
-
+    val context = LocalContext.current
     val foodItemState = viewModel.foodItemState.observeAsState().value
-    val quantity = viewModel.quantity.observeAsState().value
 
     when (foodItemState) {
         FoodItemUiModel.Loading -> LoadingScreen()
@@ -69,8 +59,17 @@ fun FoodItemScreen(
                 title = foodItemState.foodItem.name,
                 description = foodItemState.foodItem.description,
                 price = foodItemState.foodItem.price,
-                onQuantityChanged = {viewModel.changeQuantityCounter(it)},
-                quantity = quantity!!
+                onQuantityChanged = {viewModel.changeQuantityCounter(it, foodItemState.foodItem)},
+                quantity = foodItemState.foodItem.quantity,
+                onClickAddToCart = {
+                    viewModel.addFoodItemToShoppingCart(foodItemState.foodItem.copy(isAddedToCart=true))
+                    Toast
+                        .makeText(context, R.string.items_added_to_cart, Toast.LENGTH_SHORT)
+                        .show()
+                },
+                onClickContinueShopping = {navController.navigate(FoodBottomMenuItem.Menu.route)},
+                onClickGoToCart = {navController.navigate(FoodBottomMenuItem.ShoppingCart.route)},
+                isAddedToCart = foodItemState.foodItem.isAddedToCart
             )
 
         FoodItemUiModel.Error -> ErrorScreen(
@@ -88,7 +87,11 @@ fun FoodItem(
     description: String,
     price: Int,
     onQuantityChanged: (Boolean) -> Unit,
-    quantity: Int
+    quantity: Int,
+    onClickAddToCart: () -> Unit,
+    onClickContinueShopping: () -> Unit,
+    onClickGoToCart: () -> Unit,
+    isAddedToCart: Boolean
 ) {
     Column(
         modifier = Modifier.fillMaxSize()
@@ -131,8 +134,7 @@ fun FoodItem(
                         onQuantityChanged = onQuantityChanged,
                         quantity = quantity
                     )
-                }
-                else
+                } else
                     NotAvailableFood(modifier = Modifier.padding(vertical = 10.dp))
                 Divider(
                     color = colorResource(id = R.color.descriptionText),
@@ -146,7 +148,7 @@ fun FoodItem(
                 ) {
                     Text(
                         modifier = Modifier.padding(bottom = 8.dp),
-                        text = "About",
+                        text = stringResource(id = R.string.about),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -156,33 +158,37 @@ fun FoodItem(
                         color = colorResource(id = R.color.descriptionText)
                     )
                 }
-                Button(
-                    onClick = {
-                        //TODO:
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = colorResource(id = R.color.selectedCategory)
-                    ),
-                    modifier = Modifier
-                        .padding(vertical = 16.dp)
-                        .height(60.dp)
-                        .width(200.dp)
-                        .align(Alignment.CenterHorizontally),
-                    shape = RoundedCornerShape(16.dp)
-                ) {
-                    Text(
-                        text = "Add to Cart",
-                        color = colorResource(id = R.color.outlineColor),
-                        fontWeight = FontWeight.Bold
-                    )
-                    Icon(
+                if (!isAddedToCart) {
+                    StandardButton(
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        enabled = price != 0,
+                        text = R.string.add_to_cart,
                         imageVector = Icons.Default.ArrowForward,
-                        contentDescription = null,
-                        tint = colorResource(id = R.color.outlineColor),
-                        modifier = Modifier
-                            .padding(start = 4.dp)
-                            .size(20.dp, 20.dp)
+                        onClick = { onClickAddToCart() }
                     )
+                }
+                else {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ){
+                        StandardButton(
+                            modifier = Modifier.weight(1f),
+                            enabled = true,
+                            text = R.string.continue_shopping,
+                            imageVector = Icons.Default.ShoppingBasket,
+                            onClick = { onClickContinueShopping() }
+                        )
+                        StandardButton(
+                            modifier = Modifier.weight(1f),
+                            enabled = true,
+                            text = R.string.go_to_cart,
+                            imageVector = Icons.Default.ArrowForward,
+                            onClick = { onClickGoToCart() }
+                        )
+                    }
                 }
             }
         }
@@ -204,54 +210,18 @@ fun PriceAndQuantityCounter(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = NumberFormat.getCurrencyInstance(Locale.US).format(price*quantity),
+            text = priceFormatter(price*quantity),
             color = colorResource(id = R.color.outlineColor),
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold
         )
 
-        Box(
-            modifier = Modifier
-                .width(110.dp)
-                .wrapContentHeight()
-                .clip(RoundedCornerShape(10.dp))
-                .background(colorResource(id = R.color.descriptionText))
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(
-                    enabled = quantity > 1,
-                    onClick = { onQuantityChanged(false) }
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Remove,
-                        contentDescription = "",
-                        tint = Color.White
-                    )
-                }
-
-                Text(
-                    text = "$quantity",
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp
-                )
-
-                IconButton(
-                    enabled = quantity < 10,
-                    onClick = { onQuantityChanged(true) }
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = "",
-                        tint = Color.White,
-                    )
-                }
-            }
-        }
+        Counter(
+            onQuantityChanged = onQuantityChanged,
+            quantity = quantity,
+            scale = 1F,
+            enabledQuantity = quantity>1
+        )
     }
 }
 
@@ -277,6 +247,10 @@ fun FoodItemPreview() {
         quantity = 1,
         description = "Description how to cook soup, Description how to cook soupDescription how to cook soup, Description how to cook soup, Description how to cook soup, Description how to cook soup, Description how to cook soup, Description how to cook soup Description how to cook soup, Description how to cook soupDescription how to cook soup, Description how to cook soup, Description how to cook soup, Description how to cook soup, Description how to cook soup, Description how to cook soup",
         price = 10,
-        imageURl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4ehfDVe_Y5YuvJ7oc14SWbndJyWn5Ya49cQ&usqp=CAU"
+        imageURl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4ehfDVe_Y5YuvJ7oc14SWbndJyWn5Ya49cQ&usqp=CAU",
+        onClickAddToCart = {},
+        onClickContinueShopping = {},
+        onClickGoToCart = {},
+        isAddedToCart = false
     )
 }

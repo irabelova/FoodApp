@@ -2,7 +2,7 @@
     <string name="app_name">Food</string>
     <string name="menu">Menu</string>
     <string name="profile">My orders</string>
-    <string name="basket">Basket</string>
+    <string name="shopping_cart">Shopping Cart</string>
     <string name="not_available">not available</string>
     <string name="premium_quality_title">Premium quality</string>
     <string name="premium_quality_description">Using fresh, local ingredients and traditional cooking methods, we deliver outstanding taste</string>
@@ -22,4 +22,19 @@
     <string name="promo_code_is_not_required">(promo code is not required)</string>
     <string name="why_choose_us">Why choose us?</string>
     <string name="thank_you_for_choosing_us">Thank you for choosing us!!</string>
+    <string name="add_to_cart">Add to Cart</string>
+    <string name="about">About</string>
+    <string name="are_you_sure_you_want_to_remove">Are you sure you want to remove product from cart?</string>
+    <string name="remove">Remove</string>
+    <string name="apply_coupon">Apply coupon</string>
+    <string name="enter_code">Enter code</string>
+    <string name="checkout">Checkout</string>
+    <string name="items">%d items</string>
+    <string name="delivery_charges">Delivery charges</string>
+    <string name="coupon_discount">Coupon discount</string>
+    <string name="total_amount_payable">Total amount payable</string>
+    <string name="cart_items">Cart Items</string>
+    <string name="go_to_cart">Go to Cart</string>
+    <string name="continue_shopping">Continue shopping</string>
+    <string name="items_added_to_cart">Item(s) added to cart</string>
 </resources>

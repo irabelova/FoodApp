@@ -28,4 +28,9 @@ class DataBaseModule {
     fun provideDao(database: FoodDataBase): FoodDao {
         return database.foodDao()
     }
+
+//    @Provides
+//    fun provideCartItemDao(database: FoodDataBase): CartItemDao {
+//        return database.cartItemDao()
+//    }
 }
