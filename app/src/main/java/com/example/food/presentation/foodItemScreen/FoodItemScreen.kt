@@ -80,7 +80,7 @@ fun FoodItem(
     imageURl: String,
     title: String,
     description: String,
-    price: Int,
+    price: Float,
     onQuantityChanged: (Boolean) -> Unit,
     quantity: Int,
     onClickAddToCart: () -> Unit,
@@ -122,7 +122,7 @@ fun FoodItem(
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold
                 )
-                if (price != 0) {
+                if (price != 0F) {
                     PriceAndQuantityCounter(
                         modifier = Modifier.padding(vertical = 10.dp),
                         price = price,
@@ -156,7 +156,7 @@ fun FoodItem(
                 if (!isAddedToCart) {
                     StandardButton(
                         modifier = Modifier.align(Alignment.CenterHorizontally),
-                        enabled = price != 0,
+                        enabled = price != 0F,
                         text = R.string.add_to_cart,
                         imageVector = Icons.Default.ArrowForward,
                         onClick = {
@@ -196,7 +196,7 @@ fun FoodItem(
 @Composable
 fun PriceAndQuantityCounter(
     modifier: Modifier,
-    price: Int,
+    price: Float,
     onQuantityChanged: (Boolean) -> Unit,
     quantity: Int
 ) {
@@ -243,7 +243,7 @@ fun FoodItemPreview() {
         onQuantityChanged = {},
         quantity = 1,
         description = "Description how to cook soup, Description how to cook soupDescription how to cook soup, Description how to cook soup, Description how to cook soup, Description how to cook soup, Description how to cook soup, Description how to cook soup Description how to cook soup, Description how to cook soupDescription how to cook soup, Description how to cook soup, Description how to cook soup, Description how to cook soup, Description how to cook soup, Description how to cook soup",
-        price = 10,
+        price = 10F,
         imageURl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4ehfDVe_Y5YuvJ7oc14SWbndJyWn5Ya49cQ&usqp=CAU",
         onClickAddToCart = {},
         onClickContinueShopping = {},

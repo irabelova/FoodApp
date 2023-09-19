@@ -3,9 +3,11 @@ package com.example.food.domain
 import com.example.food.data.database.entities.CartItemEntity
 import com.example.food.data.database.entities.CategoryEntity
 import com.example.food.data.database.entities.FoodEntity
+import com.example.food.data.database.entities.PromoCodeEntity
 import com.example.food.domain.models.CartItem
 import com.example.food.domain.models.Category
 import com.example.food.domain.models.Food
+import com.example.food.domain.models.PromoCode
 import javax.inject.Inject
 
 class DataBaseFoodMapper @Inject constructor(){
@@ -55,5 +57,17 @@ class DataBaseFoodMapper @Inject constructor(){
             id = model.id,
             foodId = model.foodId,
             quantity = model.quantity
+        )
+
+    fun promoCodeEntityToPromoCode(entity: PromoCodeEntity) =
+        PromoCode(
+            couponName = entity.couponName,
+            percent = entity.percent
+        )
+
+    fun promoCodeToPromoCodeEntity (model: PromoCode) =
+        PromoCodeEntity(
+            couponName = model.couponName,
+            percent = model.percent
         )
 }

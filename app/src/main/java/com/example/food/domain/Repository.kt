@@ -5,6 +5,7 @@ import com.example.food.domain.models.CartItem
 import com.example.food.domain.models.Category
 import com.example.food.domain.models.Food
 import com.example.food.domain.models.FoodCartItem
+import com.example.food.domain.models.PromoCode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -67,6 +68,35 @@ class Repository @Inject constructor(
         localDataSource.deleteCartItem(cartItem)
     }
 
+    suspend fun getPromoCode (couponName: String): PromoCode? {
+        return try {
+            val promoCode = localDataSource.getPromoCode(couponName)
+            promoCode
+        } catch (ex: Exception) {
+            Log.e("Repository", "Error while loading promoCode", ex)
+            null
+        }
+    }
+
+    fun getPromoCodeList (): Flow<List<PromoCode>> {
+        return localDataSource.getPromoCodeList()
+    }
+
+    suspend fun insertPromoCode (promoCode: PromoCode)  {
+        try {
+            localDataSource.insertPromoCode(promoCode)
+        } catch (ex: Exception) {
+            Log.e("Repository", "error while saving promo code", ex)
+        }
+    }
+
+    suspend fun deletePromoCode (promoCode: PromoCode)  {
+        try {
+            localDataSource.deletePromoCode(promoCode)
+        } catch (ex: Exception) {
+            Log.e("Repository", "error while deleting promo code", ex)
+        }
+    }
 
     private suspend fun saveCategories(categories: List<Category>)  {
         try {

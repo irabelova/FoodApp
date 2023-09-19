@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.example.food.data.database.CartItemDao
 import com.example.food.data.database.FoodDao
 import com.example.food.data.database.FoodDataBase
+import com.example.food.data.database.PromoCodeDao
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -33,5 +34,10 @@ class DataBaseModule {
     @Provides
     fun provideCartItemDao(database: FoodDataBase): CartItemDao {
         return database.cartItemDao()
+    }
+
+    @Provides
+    fun providePromoCodeDao(database: FoodDataBase): PromoCodeDao {
+        return database.promoCodeDao()
     }
 }

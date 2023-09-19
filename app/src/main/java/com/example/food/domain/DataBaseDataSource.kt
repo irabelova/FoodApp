@@ -2,9 +2,11 @@ package com.example.food.domain
 
 import com.example.food.data.database.CartItemDao
 import com.example.food.data.database.FoodDao
+import com.example.food.data.database.PromoCodeDao
 import com.example.food.domain.models.CartItem
 import com.example.food.domain.models.Category
 import com.example.food.domain.models.Food
+import com.example.food.domain.models.PromoCode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -14,6 +16,7 @@ import javax.inject.Inject
 class DataBaseDataSource @Inject constructor(
     private val foodDao: FoodDao,
     private val cartItemDao: CartItemDao,
+    private val promoCodeDao: PromoCodeDao,
     private val mapper: DataBaseFoodMapper
 ) : LocalDataSource {
     override suspend fun saveCategories(categories: List<Category>) = withContext(Dispatchers.IO) {
@@ -30,11 +33,11 @@ class DataBaseDataSource @Inject constructor(
         cartItemDao.insertCartItem(entity)
     }
 
-    override suspend fun updateCartItem(foodId: Long, quantity: Int) {
+    override suspend fun updateCartItem(foodId: Long, quantity: Int) = withContext(Dispatchers.IO){
         cartItemDao.updateCartItem(foodId, quantity)
     }
 
-    override suspend fun deleteCartItem(cartItem: CartItem) {
+    override suspend fun deleteCartItem(cartItem: CartItem) = withContext(Dispatchers.IO){
         cartItemDao.deleteCartItem(mapper.cartItemToCartItemEntity(cartItem))
     }
 
@@ -61,4 +64,27 @@ class DataBaseDataSource @Inject constructor(
         }
     }
 
+    override suspend fun getPromoCode(couponName: String): PromoCode? =
+        withContext(Dispatchers.IO) {
+            val promoCodeEntity = promoCodeDao.getPromoCode(couponName)
+            return@withContext mapper.promoCodeEntityToPromoCode(promoCodeEntity)
+        }
+
+    override suspend fun insertPromoCode(promoCode: PromoCode) = withContext(Dispatchers.IO){
+        val entity = mapper.promoCodeToPromoCodeEntity(promoCode)
+        promoCodeDao.insertPromoCode(entity)
+    }
+
+    override suspend fun deletePromoCode(promoCode: PromoCode) = withContext(Dispatchers.IO){
+        val entity = mapper.promoCodeToPromoCodeEntity(promoCode)
+        promoCodeDao.deletePromoCode(entity)
+    }
+
+    override fun getPromoCodeList(): Flow<List<PromoCode>> {
+        return promoCodeDao.getPromoCodeList().map {
+            it.map { entity ->
+                mapper.promoCodeEntityToPromoCode(entity)
+            }
+        }
+    }
 }

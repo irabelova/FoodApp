@@ -34,7 +34,7 @@ fun FoodElement(
     imageURl: String,
     title: String,
     description: String,
-    price: Int,
+    price: Float,
     onItemClicked: () -> Unit
 ) {
     Row(
@@ -78,7 +78,7 @@ fun FoodElement(
             Surface(
                 border = BorderStroke(
                     1.dp,
-                    color = if (price == 0)
+                    color = if (price == 0F)
                         colorResource(id = com.example.food.R.color.descriptionText)
                     else
                         colorResource(id = com.example.food.R.color.outlineColor)
@@ -92,12 +92,12 @@ fun FoodElement(
             ) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
-                        text = if (price == 0)
+                        text = if (price == 0F)
                             stringResource(id = com.example.food.R.string.not_available)
                         else
                             priceFormatter(price),
                         fontSize = 13.sp,
-                        color = if (price == 0)
+                        color = if (price == 0F)
                             colorResource(id = com.example.food.R.color.descriptionText)
                         else
                             colorResource(id = com.example.food.R.color.outlineColor),
@@ -116,7 +116,7 @@ fun FoodElementPreview() {
     FoodElement(
         title = "Soup",
         description = "Description how to cook soup, Description how to cook soup, Description how to cook soup, Description how to cook soup, Description how to cook soup, Description how to cook soup",
-        price = 10,
+        price = 10F,
         imageURl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4ehfDVe_Y5YuvJ7oc14SWbndJyWn5Ya49cQ&usqp=CAU",
         onItemClicked = {}
     )

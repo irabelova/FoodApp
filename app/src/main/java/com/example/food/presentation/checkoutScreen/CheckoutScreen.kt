@@ -28,14 +28,14 @@ import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.SubcomposeAsyncImage
 import com.example.food.R
+import com.example.food.domain.models.PromoCode
 import com.example.food.presentation.ErrorItem
 import com.example.food.presentation.ErrorScreen
 import com.example.food.presentation.LoadingScreen
@@ -63,7 +64,9 @@ import com.example.food.utils.priceFormatter
 fun CheckoutScreen(
     checkoutViewModel: CheckoutViewModel
 ) {
-    val cartItemsState = checkoutViewModel.cartItemsStateFlow.collectAsState(CartItemsUiModel.Loading).value
+    val state = checkoutViewModel.stateFlow.collectAsState(CartItemsUiModel.Loading).value
+    val isValid = checkoutViewModel.isPromoCodeValid.observeAsState().value
+    val promoCode = checkoutViewModel.promoCode.observeAsState().value
 
     Scaffold(
         modifier = Modifier,
@@ -109,13 +112,13 @@ fun CheckoutScreen(
                         modifier = Modifier
                             .weight(1f)
                     ) {
-                        when (cartItemsState) {
+                        when (state) {
                             CartItemsUiModel.Loading -> item { LoadingScreen() }
                             is CartItemsUiModel.Data -> {
                                 items(
-                                    cartItemsState.cartItems
+                                    state.cartItems
                                 ) { foodCartItem ->
-                                    if (cartItemsState.cartItems.isNotEmpty()) {
+                                    if (state.cartItems.isNotEmpty()) {
                                         ShoppingCartItem(
                                             imageUrl = foodCartItem.food.thumbnailUrl,
                                             title = foodCartItem.food.name,
@@ -129,12 +132,26 @@ fun CheckoutScreen(
                                                 )
                                             }
                                         )
-                                    } else {
-                                    } //TODO()
+                                    }
                                 }
                                 item {
-                                    ApplyCoupon()
-                                    CheckoutDetails(price = cartItemsState.totalPriceItems, cartItemsState.totalQuantityOfItems)
+                                    ApplyCoupon(
+                                        onPromoCodeChange = {
+                                            checkoutViewModel.setPromoCode(it)
+                                        },
+                                        onPromoCodeApply = { checkoutViewModel.applyCode() },
+                                        promoCode = promoCode!!,
+                                        isValid = isValid!!,
+                                        promoCodesApplied = state.promoCodes,
+                                        onDeletePromoCode = { checkoutViewModel.deletePromoCode(it) }
+                                    )
+                                    CheckoutDetails(
+                                        price = state.totalPriceItems,
+                                        deliveryCharges = state.deliveryCharges,
+                                        couponDiscount = state.couponDiscount,
+                                        totalQuantityOfItems = state.totalQuantityOfItems,
+                                        totalAmountPayable = state.totalAmountPayable
+                                    )
                                 }
                             }
 
@@ -158,7 +175,7 @@ fun ShoppingCartItem(
     imageUrl: String,
     title: String,
     quantity: Int,
-    price: Int,
+    price: Float,
     onItemClicked: () -> Unit,
     onQuantityChanged: (Boolean) -> Unit
 ) {
@@ -218,7 +235,14 @@ fun ShoppingCartItem(
 }
 
 @Composable
-fun ApplyCoupon() {
+fun ApplyCoupon(
+    onPromoCodeChange: (String) -> Unit,
+    onPromoCodeApply: () -> Unit,
+    promoCode: String,
+    isValid: Boolean,
+    promoCodesApplied: List<PromoCode>,
+    onDeletePromoCode: (PromoCode) -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -238,11 +262,8 @@ fun ApplyCoupon() {
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-
-            var applyCode by remember { mutableStateOf("") }
-
             TextField(
-                value = applyCode,
+                value = promoCode,
 
                 colors = TextFieldDefaults.textFieldColors(
                     backgroundColor = Color.White,
@@ -253,7 +274,8 @@ fun ApplyCoupon() {
                 modifier = Modifier
                     .fillMaxWidth(0.6f)
                     .padding(end = 10.dp),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                isError = !isValid,
                 label = {
                     Text(
                         text = stringResource(id = R.string.enter_code),
@@ -262,7 +284,7 @@ fun ApplyCoupon() {
                 },
                 shape = RoundedCornerShape(8.dp),
                 onValueChange = {
-                    applyCode = it
+                    onPromoCodeChange(it)
                 }
             )
             Button(
@@ -270,7 +292,7 @@ fun ApplyCoupon() {
                     .fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 onClick = {
-                    //TODO
+                    onPromoCodeApply()
                 },
                 colors = ButtonDefaults.textButtonColors(
                     backgroundColor = colorResource(id = R.color.outlineColor)
@@ -285,13 +307,55 @@ fun ApplyCoupon() {
                 )
             }
         }
+        if (!isValid) {
+            Text(
+                text = stringResource(id = R.string.the_promo_code_is_incorrect),
+                color = Color.Red
+            )
+        }
+        if (promoCodesApplied.isNotEmpty()) {
+            promoCodesApplied.forEach { promoCode ->
+                Coupon(
+                    promoCode = promoCode,
+                    onDeletePromoCode = { onDeletePromoCode(promoCode) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun Coupon(
+    promoCode: PromoCode,
+    onDeletePromoCode: (PromoCode) -> Unit
+) {
+    Row (
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = promoCode.couponName,
+            color = Color.Gray,
+            fontSize = 14.sp
+        )
+        IconButton(
+            onClick = { onDeletePromoCode(promoCode) }
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Clear,
+                contentDescription = "",
+                tint = Color.Gray
+            )
+        }
     }
 }
 
 @Composable
 fun CheckoutDetails(
-    price: Int,
-    totalQuantityOfItems: Int
+    price: Float,
+    deliveryCharges: Float,
+    couponDiscount: Float,
+    totalQuantityOfItems: Int,
+    totalAmountPayable: Float
 ) {
     Box(
         modifier = Modifier
@@ -309,7 +373,7 @@ fun CheckoutDetails(
         ) {
 
             Text(
-                text = "Price Details",
+                text = stringResource(id = R.string.price_details),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -351,7 +415,7 @@ fun CheckoutDetails(
                 )
 
                 Text(
-                    text = "$50.00",
+                    text = priceFormatter(deliveryCharges),
                     fontSize = 14.sp,
                     color = Color.Gray
                 )
@@ -372,7 +436,7 @@ fun CheckoutDetails(
                 )
 
                 Text(
-                    text = "$184.00",
+                    text = priceFormatter(couponDiscount),
                     fontSize = 14.sp,
                     color = Color.Gray
                 )
@@ -395,7 +459,7 @@ fun CheckoutDetails(
                 )
 
                 Text(
-                    text = "$1000.00",
+                    text = priceFormatter(totalAmountPayable),
                     fontSize = 14.sp,
                     color = colorResource(id = R.color.outlineColor)
                 )
@@ -413,7 +477,7 @@ fun ShoppingCartItemPreview() {
         onQuantityChanged = {},
         onItemClicked = {},
         quantity = 1,
-        price = 10,
+        price = 10F,
         imageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4ehfDVe_Y5YuvJ7oc14SWbndJyWn5Ya49cQ&usqp=CAU"
     )
 }
@@ -421,11 +485,11 @@ fun ShoppingCartItemPreview() {
 @Preview(showSystemUi = true, showBackground = true)
 @Composable
 fun CheckoutDetailsPreview() {
-    CheckoutDetails(price = 10, 3)
+    CheckoutDetails(
+        price = 40.0F,
+        deliveryCharges = 20.0F,
+        couponDiscount = 4.0F,
+        totalQuantityOfItems = 2,
+        totalAmountPayable = 56.0F
+    )
 }
-
-//@Preview(showSystemUi = true, showBackground = true)
-//@Composable
-//fun CheckoutScreenPreview() {
-//    CheckoutScreen()
-//}

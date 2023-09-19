@@ -22,6 +22,6 @@ data class FoodEntity(
     val name: String,
     val thumbnailUrl: String,
     val description: String,
-    val price: Int,
+    val price: Float,
     val categoryId: Long
 )

@@ -21,6 +21,6 @@ class NetworkFoodMapper @Inject constructor(){
             name = dto.name,
             thumbnailUrl = dto.thumbnailUrl,
             description = dto.description,
-            price = dto.price ?: 0,
+            price = (dto.price ?: 0).toFloat()
         )
 }

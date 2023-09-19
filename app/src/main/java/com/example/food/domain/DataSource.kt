@@ -3,6 +3,7 @@ package com.example.food.domain
 import com.example.food.domain.models.CartItem
 import com.example.food.domain.models.Category
 import com.example.food.domain.models.Food
+import com.example.food.domain.models.PromoCode
 import kotlinx.coroutines.flow.Flow
 
 interface DataSource {
@@ -23,5 +24,13 @@ interface LocalDataSource: DataSource {
     suspend fun deleteCartItem (cartItem: CartItem)
 
     fun getCartItems(): Flow<List<CartItem>>
+
+    suspend fun getPromoCode (couponName: String): PromoCode?
+
+    suspend fun insertPromoCode (promoCode: PromoCode)
+
+    suspend fun deletePromoCode (promoCode: PromoCode)
+
+    fun getPromoCodeList (): Flow<List<PromoCode>>
 
 }

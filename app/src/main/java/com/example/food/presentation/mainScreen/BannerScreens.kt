@@ -45,6 +45,7 @@ import com.example.food.R
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -191,7 +192,7 @@ fun SpecialOfferBanner() {
         ) {
             Text(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .wrapContentWidth()
                     .padding(8.dp),
                 text = stringResource(id = R.string.save_ten),
                 color = colorResource(id = R.color.outlineColor),
