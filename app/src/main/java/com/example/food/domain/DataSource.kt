@@ -25,8 +25,6 @@ interface LocalDataSource: DataSource {
 
     fun getCartItems(): Flow<List<CartItem>>
 
-    suspend fun getPromoCode (couponName: String): PromoCode?
-
     suspend fun insertPromoCode (promoCode: PromoCode)
 
     suspend fun deletePromoCode (promoCode: PromoCode)

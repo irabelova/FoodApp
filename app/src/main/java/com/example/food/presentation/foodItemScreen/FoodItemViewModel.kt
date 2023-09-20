@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.food.FOOD_ITEM_ID
+import com.example.food.presentation.FOOD_ITEM_ID
 import com.example.food.di.ViewModelAssistedFactory
 import com.example.food.domain.Repository
 import com.example.food.domain.models.CartItem

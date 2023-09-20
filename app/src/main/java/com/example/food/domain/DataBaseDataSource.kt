@@ -64,12 +64,6 @@ class DataBaseDataSource @Inject constructor(
         }
     }
 
-    override suspend fun getPromoCode(couponName: String): PromoCode? =
-        withContext(Dispatchers.IO) {
-            val promoCodeEntity = promoCodeDao.getPromoCode(couponName)
-            return@withContext mapper.promoCodeEntityToPromoCode(promoCodeEntity)
-        }
-
     override suspend fun insertPromoCode(promoCode: PromoCode) = withContext(Dispatchers.IO){
         val entity = mapper.promoCodeToPromoCodeEntity(promoCode)
         promoCodeDao.insertPromoCode(entity)

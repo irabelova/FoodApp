@@ -19,79 +19,87 @@ import com.example.food.domain.models.Category
 import com.example.food.domain.models.Food
 import com.example.food.presentation.ErrorScreen
 import com.example.food.presentation.LoadingScreen
-
-
+import com.example.food.presentation.commonComposables.getBannerList
 
 
 @Composable
 fun Food(
     navController: NavController,
-    bannersList: List<@Composable () -> Unit>,
     categories: List<Category>,
     selectedCategory: Category?,
     foodState: FoodState?,
     onCategorySelected: (Category) -> Unit,
-    onReloadFood: () -> Unit
+    onReloadFood: () -> Unit,
+    selectedCity: String
 ) {
+    val bannersList = getBannerList()
+
     val listState = rememberLazyListState()
-    val firstItemIndex =  remember {
+    val firstItemIndex = remember {
         derivedStateOf {
-            listState.firstVisibleItemIndex }
+            listState.firstVisibleItemIndex
+        }
     }
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        if (firstItemIndex.value > 0) {
+            Categories(
+                categoryList = categories,
+                selectedCategory = selectedCategory,
+                onCategorySelected = onCategorySelected
+            )
+        }
+        FoodTopBar(
+            navController = navController,
+            selectedCity = selectedCity
+        )
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth(),
+            state = listState
         ) {
-            if(firstItemIndex.value > 0) {
-                Categories(
-                    categoryList = categories,
-                    selectedCategory = selectedCategory,
-                    onCategorySelected = onCategorySelected
+            item {
+                Banners(
+                    bannersList = bannersList,
+                    onBannerClicked = { navController.navigate("banners/${bannersList.size}/$it") }
                 )
             }
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth(),
-                state = listState
-            ) {
+            if (firstItemIndex.value == 0) {
                 item {
-                    Banners(
-                        bannersList = bannersList,
-                        onBannerClicked = {navController.navigate("banners/${bannersList.size}/$it")}
+                    Categories(
+                        categoryList = categories,
+                        selectedCategory = selectedCategory,
+                        onCategorySelected = onCategorySelected
                     )
                 }
-                if(firstItemIndex.value == 0) {
-                    item {
-                        Categories(
-                            categoryList = categories,
-                            selectedCategory = selectedCategory,
-                            onCategorySelected = onCategorySelected
-                        )
-                    }
+            }
+            when (foodState) {
+                FoodState.Loading -> item { LoadingScreen() }
+                is FoodState.FoodData -> items(foodState.foodList) { food ->
+                    FoodElement(
+                        modifier = Modifier.padding(16.dp),
+                        imageURl = food.thumbnailUrl,
+                        title = food.name,
+                        description = food.description,
+                        price = food.price,
+                        onItemClicked = {
+                            navController.navigate("foodItem/${food.id}")
+                        }
+                    )
                 }
-                when (foodState) {
-                    FoodState.Loading -> item{ LoadingScreen() }
-                    is FoodState.FoodData ->  items(foodState.foodList) { food ->
-                        FoodElement(
-                            modifier = Modifier.padding(16.dp),
-                            imageURl = food.thumbnailUrl,
-                            title = food.name,
-                            description = food.description,
-                            price = food.price,
-                            onItemClicked = {
-                                navController.navigate("foodItem/${food.id}")
-                            }
-                        )
-                    }
-                    FoodState.Error -> item {
-                        ErrorScreen(
-                            onButtonClicked = onReloadFood
-                        )
-                    }
-                    else -> {}
+
+                FoodState.Error -> item {
+                    ErrorScreen(
+                        onButtonClicked = onReloadFood
+                    )
                 }
+
+                else -> {}
             }
         }
     }
+}
 
 
 @Preview(showBackground = true)
@@ -139,12 +147,12 @@ fun FoodPreview() {
     )
     Food(
         navController = rememberNavController(),
-        bannersList = emptyList(),
         categories = categoryList,
         selectedCategory = categoryList[0],
         foodState = FoodState.FoodData(foodList),
         onCategorySelected = {},
-        onReloadFood = {}
+        onReloadFood = {},
+        selectedCity = "Moscow"
     )
 }
 

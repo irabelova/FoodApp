@@ -16,9 +16,6 @@ interface PromoCodeDao {
     @Delete
     suspend fun deletePromoCode(promoCode: PromoCodeEntity)
 
-    @Query("SELECT * FROM PromoCodes WHERE couponName = :couponName")
-    suspend fun getPromoCode(couponName: String): PromoCodeEntity
-
     @Query("SELECT * FROM PromoCodes")
     fun getPromoCodeList(): Flow<List<PromoCodeEntity>>
 }

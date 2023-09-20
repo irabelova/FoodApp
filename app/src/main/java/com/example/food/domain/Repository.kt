@@ -68,16 +68,6 @@ class Repository @Inject constructor(
         localDataSource.deleteCartItem(cartItem)
     }
 
-    suspend fun getPromoCode (couponName: String): PromoCode? {
-        return try {
-            val promoCode = localDataSource.getPromoCode(couponName)
-            promoCode
-        } catch (ex: Exception) {
-            Log.e("Repository", "Error while loading promoCode", ex)
-            null
-        }
-    }
-
     fun getPromoCodeList (): Flow<List<PromoCode>> {
         return localDataSource.getPromoCodeList()
     }

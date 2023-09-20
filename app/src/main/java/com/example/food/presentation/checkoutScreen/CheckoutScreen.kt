@@ -62,6 +62,7 @@ import com.example.food.utils.priceFormatter
 
 @Composable
 fun CheckoutScreen(
+    onBackButtonClick: () -> Unit,
     checkoutViewModel: CheckoutViewModel
 ) {
     val state = checkoutViewModel.stateFlow.collectAsState(CartItemsUiModel.Loading).value
@@ -92,7 +93,7 @@ fun CheckoutScreen(
                 .padding(bottom = paddingValues.calculateBottomPadding())
         ) {
             TopAppBarWithBackButton(
-                onBackButtonClick = { /*TODO*/ },
+                onBackButtonClick = { onBackButtonClick() },
                 text = stringResource(id = R.string.cart_items)
             )
             Surface(

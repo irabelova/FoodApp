@@ -23,9 +23,12 @@ import com.example.food.di.DaggerAppComponent
 import com.example.food.di.ViewModelProviderFactory
 import com.example.food.di.assistedViewModel
 import com.example.food.presentation.ErrorScreen
+import com.example.food.presentation.FOOD_ITEM_ID
+import com.example.food.presentation.FoodBottomMenuItem
 import com.example.food.presentation.FoodBottomNavigationMenu
-import com.example.food.presentation.FoodTopBar
 import com.example.food.presentation.LoadingScreen
+import com.example.food.presentation.bannerScreens.BannerScreen
+import com.example.food.presentation.bannerScreens.BannerViewModel
 import com.example.food.presentation.checkoutScreen.CheckoutScreen
 import com.example.food.presentation.checkoutScreen.CheckoutViewModel
 import com.example.food.presentation.foodItemScreen.FoodItemScreen
@@ -47,15 +50,6 @@ class MainActivity : AppCompatActivity() {
         providerFactory
     }
 
-
-
-
-    private val bannersList = listOf<@Composable () -> Unit>(
-        { FreeDeliveryBanner() },
-        { WhyChooseUsBanner() },
-        { SpecialOfferBanner() }
-    )
-
     @SuppressLint("SuspiciousIndentation")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,17 +68,18 @@ class MainActivity : AppCompatActivity() {
         val categoriesState = foodViewModel.categoryState.observeAsState().value
         val foodState = foodViewModel.foodState.observeAsState().value
         val selectedCategory = foodViewModel.selectedCategory.observeAsState().value
+        val selectedCity = foodViewModel.selectedCity.observeAsState().value
 
         when (categoriesState) {
             CategoryState.InitialLoading -> LoadingScreen()
             is CategoryState.CategoryData -> Food(
                 navController = navController,
-                bannersList = bannersList,
                 categories = categoriesState.categories,
                 selectedCategory = selectedCategory,
                 foodState = foodState,
                 onCategorySelected = { foodViewModel.changeCategory(it) },
-                onReloadFood = { foodViewModel.reloadFoods() }
+                onReloadFood = { foodViewModel.reloadFoods() },
+                selectedCity = selectedCity!!
             )
 
             CategoryState.InitialLoadingError -> ErrorScreen(
@@ -114,9 +109,9 @@ class MainActivity : AppCompatActivity() {
             composable(FoodBottomMenuItem.ShoppingCart.route) {
                 val checkoutViewModel: CheckoutViewModel = viewModel(factory = providerFactory)
 
-
                 CheckoutScreen(
-                    checkoutViewModel
+                    onBackButtonClick = {navController.popBackStack()},
+                    checkoutViewModel = checkoutViewModel
                 )
             }
             composable(FoodBottomMenuItem.Cities.route) {
@@ -134,11 +129,13 @@ class MainActivity : AppCompatActivity() {
                     navArgument("currentStep") { type = NavType.IntType },
                 )
             ) { backStackEntry ->
+                val bannerViewModel: BannerViewModel = viewModel(factory = providerFactory)
+
                 BannerScreen(
                     navController = navController,
-                    bannersList = bannersList,
                     steps = backStackEntry.arguments!!.getInt("steps"),
-                    index = backStackEntry.arguments!!.getInt("currentStep")
+                    index = backStackEntry.arguments!!.getInt("currentStep"),
+                    bannerViewModel = bannerViewModel
                 )
             }
             composable(
@@ -164,22 +161,13 @@ class MainActivity : AppCompatActivity() {
     @Composable
     private fun FoodApp() {
         val navController = rememberNavController()
-        val selectedCity = foodViewModel.selectedCity.observeAsState().value
-
 
         Scaffold(
             modifier = Modifier,
-            topBar = {
-                FoodTopBar(
-                    navController = navController,
-                    selectedCity = selectedCity!!
-                )
-            },
             bottomBar = {
                 FoodBottomNavigationMenu(
                     navController = navController
                 )
-
             }
         ) { innerPadding ->
             FoodNavHost(

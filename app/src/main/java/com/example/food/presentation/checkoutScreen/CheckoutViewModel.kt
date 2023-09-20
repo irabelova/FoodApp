@@ -111,7 +111,7 @@ class CheckoutViewModel @Inject constructor(
         }
     }
 
-    private companion object {
+    companion object {
         const val SAVE10 = "SAVE10"
         const val NEW15 = "NEW15"
     }

@@ -1,4 +1,4 @@
-package com.example.food.presentation
+package com.example.food.presentation.mainScreen
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.food.FoodBottomMenuItem
+import com.example.food.presentation.FoodBottomMenuItem
 import com.example.food.R
 
 

@@ -1,4 +1,4 @@
-package com.example.food.presentation.mainScreen
+package com.example.food.presentation.bannerScreens
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing

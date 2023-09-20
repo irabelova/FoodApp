@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.SubcomposeAsyncImage
-import com.example.food.FoodBottomMenuItem
+import com.example.food.presentation.FoodBottomMenuItem
 import com.example.food.R
 import com.example.food.presentation.ErrorItem
 import com.example.food.presentation.ErrorScreen

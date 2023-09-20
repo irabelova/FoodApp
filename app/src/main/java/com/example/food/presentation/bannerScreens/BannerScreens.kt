@@ -1,5 +1,7 @@
-package com.example.food.presentation.mainScreen
+package com.example.food.presentation.bannerScreens
 
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -7,20 +9,23 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material3.Icon
@@ -28,81 +33,111 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.example.food.presentation.FoodBottomMenuItem
 import com.example.food.R
-import android.widget.Toast
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionResult
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.LottieConstants
-import com.airbnb.lottie.compose.animateLottieCompositionAsState
-import com.airbnb.lottie.compose.rememberLottieComposition
-
+import com.example.food.presentation.commonComposables.BannerLottieAnimation
+import com.example.food.presentation.commonComposables.getBannerList
 
 @Composable
-fun BannerElement(
-    modifier: Modifier = Modifier,
-    item: @Composable () -> Unit,
-    index: Int,
-    onBannerClicked: (Int) -> Unit
+fun BannerItem(
+    currentPage: Int,
+    listOfScreens: List<@Composable () -> Unit>
 ) {
     Surface(
-        modifier = modifier
-            .width(300.dp)
-            .height(112.dp)
-            .clip(RoundedCornerShape(10.dp))
-            .clickable {
-                onBannerClicked(index)
-            },
-        content = item
+        modifier = Modifier
+            .fillMaxSize(),
+        content = listOfScreens[currentPage]
     )
 }
 
 @Composable
-fun BannerLottieAnimation(
-    modifier: Modifier,
-    animationId: Int
+fun BannerScreen(
+    navController: NavController,
+    steps: Int,
+    index: Int,
+    bannerViewModel: BannerViewModel
 ) {
-    val compositionResult: LottieCompositionResult = rememberLottieComposition(
-        spec = LottieCompositionSpec.RawRes(
-            animationId
+    val bannersList = getBannerList{bannerViewModel.insertPromoCode()}
+
+    val isPressed = bannerViewModel.isPressed.observeAsState().value
+    val currentStep = bannerViewModel.currentStep.observeAsState().value
+
+    val goToNextScreen: () -> Unit = {
+        if (index + 1 < bannersList.size) {
+            navController.navigate("banners/$steps/${index + 1}")
+            bannerViewModel.setCurrentStep(true)
+        } else {
+            navController.popBackStack(FoodBottomMenuItem.Menu.route, false)
+        }
+    }
+    val goToPreviousScreen = {
+        if (index > 0 && index != currentStep) {
+            navController.navigate("banners/$steps/${index - 1}")
+        } else if (index > 0) {
+            navController.popBackStack()
+        }
+        bannerViewModel.setCurrentStep(false)
+    }
+
+    BackHandler(
+        enabled = true
+    ) {
+        navController.popBackStack(FoodBottomMenuItem.Menu.route, false)
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .pointerInput(Unit) {
+                val maxWidth = this.size.width
+                detectTapGestures(
+                    onPress = {
+                        val pressStartTime = System.currentTimeMillis()
+                        bannerViewModel.setIsPressedFlag(true)
+                        this.tryAwaitRelease()
+                        val pressEndTime = System.currentTimeMillis()
+                        val totalPressTime = pressEndTime - pressStartTime
+                        if (totalPressTime < 200) {
+                            val isTapOnRightThreeQuarters = (it.x > (maxWidth / 4))
+                            if (isTapOnRightThreeQuarters) {
+                                goToNextScreen()
+                            } else {
+                                goToPreviousScreen()
+                            }
+                        }
+                        bannerViewModel.setIsPressedFlag(false)
+                    },
+                )
+            }
+    ) {
+        BannerItem(
+            currentPage = index,
+            listOfScreens = bannersList
         )
-    )
-
-    val progress by animateLottieCompositionAsState(
-        composition = compositionResult.value,
-        isPlaying = true,
-        iterations = LottieConstants.IterateForever,
-        speed = 1.0F
-    )
-
-    LottieAnimation(
-        modifier = modifier,
-        composition = compositionResult.value,
-        progress = progress
-    )
+        BannerProgressBar(steps, index, isPressed!!, goToNextScreen)
+    }
 }
+
 
 @Composable
 fun WhyChooseUsBannerTexts(
@@ -131,7 +166,9 @@ fun WhyChooseUsBannerTexts(
 }
 
 @Composable
-fun SpecialOfferBanner() {
+fun SpecialOfferBanner(
+    onPromoCodeClicked: () -> Unit
+) {
     val infiniteTransition = rememberInfiniteTransition(label = "")
     val dy by infiniteTransition.animateFloat(
         initialValue = 0f,
@@ -180,6 +217,7 @@ fun SpecialOfferBanner() {
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .clickable {
+                    onPromoCodeClicked()
                     Toast
                         .makeText(context, R.string.promo_code_has_been_applied, Toast.LENGTH_SHORT)
                         .show()
@@ -382,39 +420,12 @@ fun WhyChooseUsBanner() {
     }
 }
 
-
-@Composable
-fun Banners(
-    bannersList: List<@Composable () -> Unit>,
-    onBannerClicked: (Int) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier
-            .horizontalScroll(rememberScrollState())
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        bannersList.forEach {
-            BannerElement(
-                item = it,
-                index = bannersList.indexOf(it),
-                onBannerClicked = onBannerClicked,
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun BannersPreview() {
-    Banners(modifier = Modifier, bannersList = emptyList(), onBannerClicked = {})
-}
-
 @Preview(showBackground = true)
 @Composable
 fun SpecialOfferBannerPreview() {
-    SpecialOfferBanner()
+    SpecialOfferBanner(
+        onPromoCodeClicked = {}
+    )
 }
 
 @Preview(showBackground = true)
